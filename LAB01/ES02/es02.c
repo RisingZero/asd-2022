@@ -19,7 +19,7 @@ typedef struct corsa_s {
 
 enum comando_e { r_date, r_partenza, r_capolinea, r_ritardo, r_ritardo_tot, r_fine };
 
-int readFile(FILE *fin, corsa_t corse[]);
+int readFile(corsa_t corse[]);
 enum comando_e leggiComando();
 void selezionaDati(corsa_t corse[], int numCorse, enum comando_e comando);
 void stampaCorsa(corsa_t corsa);
@@ -32,11 +32,10 @@ void getDelayByTripCode(corsa_t corse[], int numCorse);
 
 int main(int argc, char const *argv[])
 {
-    FILE *fp;
     enum comando_e comando;
     int numCorse;
     corsa_t corse[MAX_NUM];
-    numCorse = readFile(fp, corse);
+    numCorse = readFile(corse);
 
     do {
         comando = leggiComando();
@@ -47,15 +46,16 @@ int main(int argc, char const *argv[])
     return 0;
 }
 
-int readFile(FILE *fin, corsa_t corse[]) {
+int readFile(corsa_t corse[]) {
+    FILE *fp;
     int i;
     int numCorse;
 
-    fin = fopen(FILENAME, "r");
-    fscanf(fin, "%d", &numCorse);
+    fp = fopen(FILENAME, "r");
+    fscanf(fp, "%d", &numCorse);
 
     for (i = 0; i < numCorse; i++) {
-        fscanf(fin, "%s %s %s %s %s %s %d", 
+        fscanf(fp, "%s %s %s %s %s %s %d", 
             corse[i].codice,
             corse[i].partenza,
             corse[i].destinazione,
@@ -64,6 +64,8 @@ int readFile(FILE *fin, corsa_t corse[]) {
             corse[i].arrivTime,
             &corse[i].ritardo );
     }
+
+    fclose(fp);
 
     return numCorse;
 }
@@ -184,9 +186,10 @@ void getDelayByTripCode(corsa_t corse[], int numCorse) {
 
     if (scanf("%s", tripCode) == 1) {
         for (i = 0; i < numCorse; i++) {
-            if (strcmp(corse[i].codice, tripCode) == 0)
+            if (strcmp(corse[i].codice, tripCode) == 0) {
                 stampaCorsa(corse[i]);
                 totDelay += corse[i].ritardo;
+            }
         }
         printf("Ritardo totale accumulato: %d\n", totDelay);
     } else {
