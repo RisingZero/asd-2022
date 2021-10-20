@@ -58,7 +58,10 @@ int readFile(corsa_t corse[]) {
     int i;
     int numCorse;
 
-    fp = fopen(FILENAME, "r");
+    if ((fp = fopen(FILENAME, "r")) == NULL) {
+        printf("ERRORE apertura file di input!");
+        exit(1);
+    }
     fscanf(fp, "%d", &numCorse);
 
     for (i = 0; i < numCorse; i++) {
@@ -256,7 +259,7 @@ void ricercaLineare(corsa_t corse[], int numCorse, char *input) {
     int i, found = 0;
     char str[MAX_LEN*10];
     for (i = 0; i < numCorse; i++) {
-        if (strncmp(corse[i].partenza, input, __min(strlen(input), strlen(corse[i].partenza))) == 0) {
+        if (strncmp(corse[i].partenza, input, strlen(input)) == 0) {
             formattaCorsa(corse[i], str);
             printf("Posizione: %d -- %s", i, str);
             found = 1;
@@ -274,7 +277,7 @@ void ricercaDicotomica(corsa_t corse[], int numCorse, char *input) {
 
     while (!found && (l <= r)) {
         idx = (r+l)/2;
-        cmp = strncmp(corse[idx].partenza, input, __min(strlen(input), strlen(corse[idx].partenza)));
+        cmp = strncmp(corse[idx].partenza, input, strlen(input));
         if (cmp == 0) {
             found = 1;
         } else if (cmp > 0) {
@@ -289,13 +292,13 @@ void ricercaDicotomica(corsa_t corse[], int numCorse, char *input) {
         printf("Posizione: %d -- %s", idx, str);
 
         i = idx + 1;
-        while((i < numCorse) && (strncmp(corse[i].partenza, input, __min(strlen(input), strlen(corse[i].partenza))) == 0)) {
+        while((i < numCorse) && (strncmp(corse[i].partenza, input, strlen(input)) == 0)) {
             formattaCorsa(corse[i], str);
             printf("Posizione: %d -- %s", i, str);
             i++;
         }
         i = idx - 1;
-        while((i >= 0) && (strncmp(corse[i].partenza, input, __min(strlen(input), strlen(corse[i].partenza))) == 0)) {
+        while((i >= 0) && (strncmp(corse[i].partenza, input, strlen(input)) == 0)) {
             formattaCorsa(corse[i], str);
             printf("Posizione: %d -- %s", i, str);
             i--;
