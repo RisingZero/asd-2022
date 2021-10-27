@@ -1,20 +1,22 @@
 /* 
-    LAB1 ES01 RAINERI ANDREA ANGELO S280848
+    LAB03 ES02 RAINERI ANDREA ANGELO S280848
     ALGORITMI E STRUTTURE DATI
  */
 
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #define MAXLEN 255
 
 typedef struct amico_s {
-    char **playlist;
+    char **song;
     int num_proposte;
 } Amico;
 
 int readFile(Amico *amici[]);
 void showSoluzioni(Amico amici[], char *sol[], int numAmici);
-int combinaSoluzione(int pos, Amico amici[], char  *sol[], int numAmici, int cnt);
+int combinaSoluzione(int pos, Amico amici[], char *sol[], int numAmici, int cnt);
+void freeAll(Amico amici[], char *sol[], int numAmici);
 
 int main(int argc, char const *argv[])
 {
@@ -34,6 +36,7 @@ int main(int argc, char const *argv[])
     }
 
     showSoluzioni(amici, sol, numAmici);
+    freeAll(amici, sol, numAmici);
     return 0;
 }
 
@@ -48,19 +51,20 @@ int readFile(Amico *amici[]) {
 
     fscanf(fp, "%d", &numAmici);
     *amici = (Amico *) malloc(numAmici * sizeof(Amico));
+
     if (*amici == NULL)
         exit(2);
 
     for (i = 0; i < numAmici; i++) {
         fscanf(fp, "%d", &((*amici)[i].num_proposte));
-        (*amici)[i].playlist = (char **) malloc((*amici)[i].num_proposte * sizeof(char *));
-        if ((*amici)[i].playlist == NULL)
+        (*amici)[i].song = (char **) malloc((*amici)[i].num_proposte * sizeof(char *));
+        if ((*amici)[i].song == NULL)
             exit(2);
         for (j = 0; j < (*amici)[i].num_proposte; j++) {
-            (*amici)[i].playlist[j] = (char *) malloc(MAXLEN * sizeof(char));
-            if ((*amici)[i].playlist[j] ==  NULL)
+            (*amici)[i].song[j] = (char *) malloc(MAXLEN * sizeof(char));
+            if ((*amici)[i].song[j] ==  NULL)
                 exit(2);
-            fscanf(fp, "%s", (*amici)[i].playlist[j]);
+            fscanf(fp, "%s", (*amici)[i].song[j]);
         }
     }
 
@@ -74,7 +78,7 @@ void showSoluzioni(Amico amici[], char *sol[], int numAmici) {
 
     cnt = combinaSoluzione(0, amici, sol, numAmici, cnt);
 
-    printf("Totale soluzioni: %d", cnt);
+    printf("Totale soluzioni: %d\n", cnt);
 }
 
 int combinaSoluzione(int pos, Amico amici[], char  *sol[], int numAmici, int cnt) {
@@ -90,9 +94,24 @@ int combinaSoluzione(int pos, Amico amici[], char  *sol[], int numAmici, int cnt
     }
 
     for (i = 0; i < amici[pos].num_proposte; i++) {
-        sol[pos] = amici[pos].playlist[i];
+        strcpy(sol[pos], amici[pos].song[i]);
         cnt = combinaSoluzione(pos+1, amici, sol, numAmici, cnt);
     }
 
     return cnt;
+}
+
+void freeAll(Amico amici[], char *sol[], int numAmici) {
+    int i, j;
+    printf("free\n");
+
+    for (i = 0; i < numAmici; i++) {
+        for (j = 0; j < amici[i].num_proposte; j++) {
+            free(amici[i].song[j]);
+        }
+        free(amici[i].song);
+        free(sol[i]);
+    }
+    free(amici);
+    free(sol);
 }
