@@ -92,9 +92,10 @@ link insertNodeAtTail(Item val, link head) {
  *  @return --
  */
 void insertNodeAtTailP(Item val, link *head) {
-
-    for ( ; *head != NULL; (*head)->next);
-    *head = newNode(val, NULL);
+    link *xp;
+    
+    for (*xp = head; *xp != NULL; xp  =&((*xp)->next));
+    *xp = newNode(val, NULL);
 
 }
 
