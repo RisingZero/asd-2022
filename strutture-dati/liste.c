@@ -63,3 +63,59 @@ void insertNodeAtHeadP(Item val, link *head) {
     *head = newNode(val, *head);
 
 }
+
+/**
+ *  * Insert node at tail of list
+ *  @param Item Data of the node
+ *  @param link Head of the list
+ *  @return Pointer to the new head of the list
+ */
+link insertNodeAtTail(Item val, link head) {
+    link t;
+
+    if (head == NULL) {
+
+        return newNode(val, NULL);
+    }
+
+    for (t = head; t->next != NULL; t = t->next);
+    t->next = newNode(val, NULL);
+
+    return head;
+
+}
+
+/**
+ *  * Insert node at tail of list (by pointer)
+ *  @param Item Data of the node
+ *  @param link* Pointer to head of the list
+ *  @return --
+ */
+void insertNodeAtTailP(Item val, link *head) {
+
+    for ( ; *head != NULL; (*head)->next);
+    *head = newNode(val, NULL);
+
+}
+
+/**
+ *  * Insert node at tail of list fast with pointer to tail
+ *  @param Item Data of the node
+ *  @param link* Pointer to head of the list
+ *  @param link* Pointer to tail of the list
+ *  @return --
+ */
+void insertNodeAtTailFastP(Item val, link *head, link *tail) {
+    link t;
+    if (*head == NULL) {
+
+        *head = *tail = newNode(val, NULL);
+
+    } else {
+
+        t = newNode(val, NULL);
+        (*tail)->next = t;
+        *tail = t;
+
+    }
+}
