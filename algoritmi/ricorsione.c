@@ -3,6 +3,8 @@
     ALGORITMI RICORSIVI
  */
 
+#include <stdio.h>
+#define N_dim 10
 
 /**
  *  * MAX FUNCTION WRAPPER: 
@@ -39,4 +41,12 @@ int maxR(int A[], int l, int r) {
         return m2;
     else
         return m1;
+}
+
+int main(int argc, char const *argv[])
+{
+    int V[N_dim] = {1, 34, 2, 45, 6, 7, 8, 98, 124, 2};
+    printf("Max: %d\n", max(V, N_dim));
+    
+    return 0;
 }
