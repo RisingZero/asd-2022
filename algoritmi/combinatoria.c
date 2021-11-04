@@ -9,7 +9,7 @@ typedef struct livello_s {
 } Livello;
 
 /**
- *  * Principio moltiplicativo del calcolo combinatorio:
+ *  * Principio moltiplicativo del calcolo combinatorio: 
  *  * CALCOLO NUMERO SOLUZIONI
  *  @param int indice di scelta da effettuare (lv di ricorsione)
  *  @param Livello[] struttura dati contente info sui livelli di scelta (dim n)
