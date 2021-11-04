@@ -3,6 +3,9 @@
     ALGORITMI DI ORDINAMENTO
  */
 
+#include <stdio.h>
+#define N_dim 10
+
 /**
  *  * MERGE SORT WRAPPER: 
  *  * Hides the recursive implementation of the algorithm to the client
@@ -134,4 +137,20 @@ int partition(int A[], int l, int r) {
     A[r] = tmp;
     
     return i;
+}
+
+int main(int argc, char const *argv[])
+{   
+    int V[N_dim]= {3, 65, 32, 1, 8, 6, 9, 123, 54, 2};
+    /*   
+    int aux[N_dim];
+    MergeSort(V, aux, N_dim);
+    */
+    /* 
+   QuickSort(V, N_dim);
+    */
+    for (int i=0; i<N_dim; i++) {
+        printf("%d ", V[i]);
+    }
+    return 0;
 }
