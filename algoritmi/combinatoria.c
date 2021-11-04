@@ -155,3 +155,60 @@ int permutazioniRipetute(int pos, int *val_dist, int *mark, int n_dist, int *sol
 
     return cnt;
 }
+
+/**
+ *  * Calcolo delle combinazioni semplici
+ *  @param int indice di scelta da effettuare (lv di ricorsione)
+ *  @param int[] vettore contente oggetti tra cui scegliere (dim n)
+ *  @param int dimensione n dell'insieme di oggetti
+ *  @param int[] vettore dove tenere traccia delle scelte e comporre la soluzione (dim k)
+ *  @param int dimensione k della soluzione cercata
+ *  @param int indice di val da cui iniziare a riempire la soluzione, forza un ordinamento
+ *  @param int contatore soluzioni identificate
+ *  @return int contatore soluzioni aggiornato
+ */
+int combinazioniSemplici(int pos, int *val, int n, int *sol, int k, int start, int cnt) {
+    int i;
+
+    // Terminal condition
+    if (pos >= k) {
+        // print found solution
+        return cnt+1;
+    }
+
+    for (i = start; i < n; i++) {
+        sol[pos] = val[i];
+        cnt = combinazioniSemplici(pos+1, val, n, sol, k, i+1, cnt);
+    }
+
+    return cnt;
+}
+
+/**
+ *  * Calcolo delle combinazioni ripetute 
+ *  @param int indice di scelta da effettuare (lv di ricorsione)
+ *  @param int[] vettore contente oggetti tra cui scegliere (dim n)
+ *  @param int dimensione n dell'insieme di oggetti
+ *  @param int[] vettore dove tenere traccia delle scelte e comporre la soluzione (dim k)
+ *  @param int dimensione k della soluzione cercata
+ *  @param int indice di val da cui iniziare a riempire la soluzione, forza un ordinamento
+ *  @param int contatore soluzioni identificate
+ *  @return int contatore soluzioni aggiornato
+ */
+int combinazioniRipetute(int pos, int *val, int n, int *sol, int k, int start, int cnt) {
+    int i;
+
+    // Terminal condition
+    if (pos >= k) {
+        // print found solution
+        return cnt+1;
+    }
+
+    for (i = start; i < n; i++) {
+        sol[pos] = val[i];
+        cnt = combinazioniRipetute(pos+1, val, n, sol, k, start, cnt);
+        start++;
+    }
+
+    return cnt;
+}
