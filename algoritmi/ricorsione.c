@@ -72,11 +72,35 @@ int binarySearch(int array[], int l, int r, int k) {
     }
 }
 
+/**
+ *  * Hanoi Towers algorithm: moves N disks from src to dest
+ *  @param int number of disks to move
+ *  @param int src tower
+ *  @param int dest tower
+ *  @return --
+ */
+void hanoi(int N, int src, int dest) {
+    int aux = 3 - (src+dest);
+
+    // Terminal condition: 1 disk to move from src to dest
+    if (N == 1) {
+        printf("src %d -> dest %d\n", src, dest);
+        return;
+    }
+
+    // Recursive calls
+    hanoi(N-1, src, aux);
+    printf("src %d -> dest %d\n", src, dest);
+    hanoi(N-1, aux, dest);
+}
+
 int main(int argc, char const *argv[])
 {
     int V[N_dim] = {1, 34, 2, 45, 6, 7, 8, 98, 124, 2};
     printf("Max: %d\n", max(V, N_dim));
     printf("%d\n", binarySearch(V, 0, N_dim-1, 124));
     
+    hanoi(3, 0, 2);
+
     return 0;
 }
