@@ -20,7 +20,6 @@ int main(void) {
         }
     } while (continua);
 
-    //TODO: fix terminazione programma
     return 0;
 }
 
