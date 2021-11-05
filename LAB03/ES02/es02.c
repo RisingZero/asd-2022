@@ -103,7 +103,6 @@ int combinaSoluzione(int pos, Amico amici[], char  *sol[], int numAmici, int cnt
 
 void freeAll(Amico amici[], char *sol[], int numAmici) {
     int i, j;
-    printf("free\n");
 
     for (i = 0; i < numAmici; i++) {
         for (j = 0; j < amici[i].num_proposte; j++) {
