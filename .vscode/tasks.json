@@ -16,9 +16,12 @@
                 ],
             },
             "osx": {
-                "command": "",
+                "command": "gcc",
                 "args": [
-
+                    "-g",
+                    "${file}",
+                    "-o",
+                    "${fileDirname}\\${fileBasenameNoExtension}.out"
                 ]
             },
             "group": "build",
@@ -40,9 +43,11 @@
                 ]
             },
             "osx": {
-                "command": "",
+                "command": "gcc",
                 "args": [
-
+                    "${file}",
+                    "-o",
+                    "${fileDirname}\\${fileBasenameNoExtension}.out"
                 ]
             },
             "group": "build",
