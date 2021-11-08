@@ -17,6 +17,7 @@ Command readCommand(void);
 void handleCommand(Command command, link *list);
 int isFilename(char *str);
 void readNode(link *list);
+void searchHandler(link list);
 void printHandler(link list);
 
 int main(int argc, char const *argv[])
@@ -36,7 +37,7 @@ int main(int argc, char const *argv[])
 
 void availableCommands() {
     printf(
-        "Comandi disponibili:\n\
+        "\nComandi disponibili:\n\
         - leggi (Acquisizione nuova anagrafica da tastiera o file)\n\
         - ricerca <AXXXX> (Ricerca anagrafica per codice)\n\
         - del_codice <AXXXX> (Eliminazione anagrafica per codice)\n\
@@ -48,7 +49,8 @@ void availableCommands() {
 
 Command readCommand(void) {
     char input[COMMAND_SIZE];
-    printf("Inserisci comando: \n");
+    printf("\nInserisci comando: \n");
+    printf("--> ");
     scanf("%s", input);
 
     if (strcmp(input, "leggi") == 0)
@@ -76,6 +78,7 @@ void handleCommand(Command command, link *list) {
             readNode(list);
             break;
         case search:
+            searchHandler(*list);
             break;
         case deleteByCode:
             break;
@@ -92,13 +95,15 @@ void handleCommand(Command command, link *list) {
 int isFilename(char *str) {
     size_t lenstr;
     size_t lenext;
-    int i = 0;
+    int i = 0, checkExt = 0, checkSpace = 0;
     char *extension = ".txt";
 
     if (!str)
         return 0;
 
     while (str[i] != '\0') {
+        if (str[i] == ' ')
+            checkSpace = 1;
         if (str[i] == '\n') {
             str[i] = '\0';
             break;
@@ -112,22 +117,29 @@ int isFilename(char *str) {
     if (lenstr < lenext)
         return 0;
     
-    return strncmp(str + lenstr - lenext, extension, lenext) == 0;
+    checkExt = strncmp(str + lenstr - lenext, extension, lenext) == 0;
+    if (checkExt) {
+        if (checkSpace)
+            return -1;
+        return 1;
+    }
+    return 0;
 }
 
 void readNode(link *list) {
     FILE *fp;
     char input[BUFF_SIZE];
+    int nameCheck = 0;
     Item val;
 
-    printf("-- ACQUISIZIONE NUOVA ANAGRAFICA --\n");
+    printf("\n-- ACQUISIZIONE NUOVA ANAGRAFICA --\n");
     printf("Inserisci il nome di un file da cui caricare le anagrafiche o una nuova anagrafica con formattazione:\n");
     printf("<AXXXX> <nome> <cognome> <data di nascita gg/mm/aaaa> <via> <citta'> <cap>\n");
     printf("--> ");
 
     getchar(); fgets(input, BUFF_SIZE, stdin);
-
-    if (isFilename(input)) {
+    nameCheck = isFilename(input);
+    if (nameCheck == 1) {
         if ((fp = fopen(input, "r")) == NULL) {
             printf("ERRORE apertura file!\n");
             return;
@@ -137,9 +149,31 @@ void readNode(link *list) {
             *list = insertOrderedByCode(val, *list);
         }
         fclose(fp);
-    } else {
+    } else if (nameCheck == -1) {
+        printf("ERRORE: il nome del file non deve contenere spazi!\n");
+        return;
+    } else if (nameCheck == 0) {
         val = stringToItem(input);
         *list = insertOrderedByCode(val, *list);
+    }
+}
+
+void searchHandler(link list) {
+    Item res;
+    char codekey[CODE_LEN];
+
+    printf("\n-- RICERCA PER CODICE --\n");
+    printf("Inserisci il codice dell'anagrafica da ricercare nel formato <AXXXX>\n");
+    printf("--> ");
+
+    scanf("%s", codekey);
+
+    res = getItemByCode(list, codekey);
+    if (res == NULL) {
+        printf("Nessun risultato trovato per codice < %s >\n", codekey);
+    } else {
+        printf("Risultato ricerca:\n");
+        printItem(stdout, res);
     }
 }
 
@@ -148,7 +182,7 @@ void printHandler(link list) {
     int opt;
     char filename[BUFF_SIZE];
 
-    printf("-- STAMPA ANAGRAFICHE --\n");
+    printf("\n-- STAMPA ANAGRAFICHE --\n");
     printf("0 - stampa a video\n1 <nome file> - stampa su file\n");
     printf("--> ");
 
