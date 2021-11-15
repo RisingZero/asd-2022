@@ -37,6 +37,13 @@ typedef struct node_s {
 
 typedef char* Key;
 
+/* Date operations */
+
+int DateLt(Date x, Date y);
+int DateGt(Date x, Date y);
+
+/* Item operations */
+
 Item stringToItem(char *str);
 Key ItemKey(Item item);
 int ItemLt(Key x, Key y);
@@ -49,5 +56,7 @@ void printItem(FILE *fp, Item x);
 link insertOrderedByCode(Item val, link head);
 Item getItemByCode(link head, Key key);
 void printList(FILE *fp, link h);
+Item extractByCode(link *headp, Key key);
+Item extractInDates(link *headp, Date first, Date last);
 
 #endif

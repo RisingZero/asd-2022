@@ -19,6 +19,8 @@ int isFilename(char *str);
 void readNode(link *list);
 void searchHandler(link list);
 void printHandler(link list);
+void handleDeleteByCode(link *list);
+void handleDeleteInDates(link *list);
 
 int main(int argc, char const *argv[])
 {
@@ -81,6 +83,7 @@ void handleCommand(Command command, link *list) {
             searchHandler(*list);
             break;
         case deleteByCode:
+            handleDeleteByCode(list);
             break;
         case deleteInDates:
             break;
@@ -206,5 +209,47 @@ void printHandler(link list) {
         printList(fp, list);
     } else {
         printf("ERRORE comando non valido\n");
+    }
+}
+
+void handleDeleteByCode(link *list) {
+    Item res;
+    char codekey[CODE_LEN];
+    
+    printf("\n-- ELIMINAZIONE PER CODICE --\n");
+    printf("Inserisci il codice dell'anagrafica da eliminare nel formato <AXXXX>\n");
+    printf("--> ");
+
+    scanf("%s", codekey);
+
+    res = extractByCode(list, codekey);
+    if (res == NULL) {
+        printf("Nessun risultato trovato per codice < %s >\n", codekey);
+    } else {
+        printf("Eliminato il seguente elemento:\n");
+        printItem(stdout, res);
+    }
+}
+
+void handleDeleteInDates(link *list) {
+    Item res;
+    Date firstDate, secondDate;
+
+    printf("\n-- ELIMINAZIONE ANAGRAFICE TRA DATE DI NASCITA --\n");
+    printf("Inserisci i due estremi di date nel formato <gg/mm/aaaa>\n");
+    printf("--> ");
+
+    scanf("%d/%d/%d %d/%d/%d",
+        firstDate.day, firstDate.month, firstDate.year,
+        secondDate.day, secondDate.month, secondDate.year
+    );
+
+    while ((res = extractInDates(list, firstDate, secondDate)) != NULL) {
+        if (res == NULL) {
+            printf("Nessun risultato trovato tra le date indicate\n");
+        } else {
+            printf("Eliminato il seguente elemento:\n");
+            printItem(stdout, res);
+        }
     }
 }

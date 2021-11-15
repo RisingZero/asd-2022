@@ -7,6 +7,14 @@
 #include <stdlib.h>
 #include "Item.h"
 
+int DateLt(Date x, Date y) {
+    return (x.year*10000 + x.month*100 + x.day) < (y.year*10000 + y.month*100 + y.day);
+}
+
+int DateGt(Date x, Date y) {
+    return (x.year*10000 + x.month*100 + x.day) > (y.year*10000 + y.month*100 + y.day);
+}
+
 /** 
  * * Creates new node and returns pointer to the node
  * @param Item Data of the new node
@@ -24,6 +32,17 @@ static link newNode(Item val, link next) {
     t->next = next;
 
     return t;
+}
+
+static link freeNode(link node) {
+    free(node->val->code);
+    free(node->val->name);
+    free(node->val->surname);
+    free(node->val->address);
+    free(node->val->city);
+    free(node->val->date);
+    free(node->val);
+    free(node);
 }
 
 Item stringToItem(char *str) {
@@ -129,4 +148,39 @@ void printList(FILE *fp, link h) {
 
     printItem(fp, h->val);
     printList(fp, h->next);
+}
+
+Item extractByCode(link *headp, Key key) {
+    link *xp, t;
+    Item element = NULL;
+
+    for (xp = headp; *xp != NULL; xp = &((*xp)->next)) {
+        if (ItemEq(ItemKey((*xp)->val), key)) {
+            element = (*xp)->val;
+            t = *xp;
+            *xp = (*xp)->next;
+            freeNode(t);
+            break;
+        }
+    }
+
+    return element;
+}
+
+Item extractInDates(link *headp, Date first, Date last) {
+    link *xp, t;
+    Item element = NULL;
+
+    for (xp = headp; *xp != NULL; xp = &((*xp)->next)) {
+        if (DateGt(*((*xp)->val->date), first) && DateLt(*((*xp)->val->date), last)) {
+            element = (*xp)->val;
+            t = *xp;
+            *xp = (*xp)->next;
+            freeNode(t);
+            break;
+        }
+    }
+
+    return element;
+
 }
