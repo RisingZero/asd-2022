@@ -34,7 +34,7 @@ static link newNode(Item val, link next) {
     return t;
 }
 
-static link freeNode(link node) {
+static void freeNode(link node) {
     free(node->val->code);
     free(node->val->name);
     free(node->val->surname);
@@ -87,6 +87,39 @@ Item stringToItem(char *str) {
     x->cap = cap;
 
     return x;
+}
+
+Item ItemCopy(Item x) {
+    Item new = NULL;
+
+    if ((new = (Item) malloc(sizeof(struct item_s))) == NULL) {
+        printf("ERROR: out of memory");
+        exit(2);
+    }
+    new->code = strdup(x->code);
+    new->name = strdup(x->name);
+    new->surname = strdup(x->surname);
+    new->city = strdup(x->city);
+    new->address = strdup(x->address);
+    new->cap = x->cap;
+    if ((new->date = (Date *) malloc(sizeof(Date))) == NULL) {
+        printf("ERROR: out of memory");
+        exit(2);
+    }
+    new->date->day = x->date->day;
+    new->date->month = x->date->month;
+    new->date->year = x->date->year;
+
+    return new;
+}
+
+void ItemDestroy(Item x) {
+    free(x->code);
+    free(x->name);
+    free(x->surname);
+    free(x->address);
+    free(x->city);
+    free(x->date);
 }
 
 Key ItemKey(Item val) {
@@ -156,7 +189,7 @@ Item extractByCode(link *headp, Key key) {
 
     for (xp = headp; *xp != NULL; xp = &((*xp)->next)) {
         if (ItemEq(ItemKey((*xp)->val), key)) {
-            element = (*xp)->val;
+            element = ItemCopy((*xp)->val);
             t = *xp;
             *xp = (*xp)->next;
             freeNode(t);
@@ -173,7 +206,7 @@ Item extractInDates(link *headp, Date first, Date last) {
 
     for (xp = headp; *xp != NULL; xp = &((*xp)->next)) {
         if (DateGt(*((*xp)->val->date), first) && DateLt(*((*xp)->val->date), last)) {
-            element = (*xp)->val;
+            element = ItemCopy((*xp)->val);
             t = *xp;
             *xp = (*xp)->next;
             freeNode(t);

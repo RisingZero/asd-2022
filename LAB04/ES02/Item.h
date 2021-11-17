@@ -45,6 +45,8 @@ int DateGt(Date x, Date y);
 /* Item operations */
 
 Item stringToItem(char *str);
+Item ItemCopy(Item x);
+void ItemDestroy(Item x);
 Key ItemKey(Item item);
 int ItemLt(Key x, Key y);
 int ItemEq(Key x, Key y);

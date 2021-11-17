@@ -86,6 +86,7 @@ void handleCommand(Command command, link *list) {
             handleDeleteByCode(list);
             break;
         case deleteInDates:
+            handleDeleteInDates(list);
             break;
         case print:
             printHandler(*list);
@@ -229,27 +230,34 @@ void handleDeleteByCode(link *list) {
         printf("Eliminato il seguente elemento:\n");
         printItem(stdout, res);
     }
+
+    ItemDestroy(res);
 }
 
 void handleDeleteInDates(link *list) {
     Item res;
     Date firstDate, secondDate;
+    int found = 0;
 
-    printf("\n-- ELIMINAZIONE ANAGRAFICE TRA DATE DI NASCITA --\n");
+    printf("\n-- ELIMINAZIONE ANAGRAFICHE TRA DATE DI NASCITA --\n");
     printf("Inserisci i due estremi di date nel formato <gg/mm/aaaa>\n");
     printf("--> ");
 
     scanf("%d/%d/%d %d/%d/%d",
-        firstDate.day, firstDate.month, firstDate.year,
-        secondDate.day, secondDate.month, secondDate.year
+        &firstDate.day, &firstDate.month, &firstDate.year,
+        &secondDate.day, &secondDate.month, &secondDate.year
     );
 
     while ((res = extractInDates(list, firstDate, secondDate)) != NULL) {
-        if (res == NULL) {
-            printf("Nessun risultato trovato tra le date indicate\n");
-        } else {
-            printf("Eliminato il seguente elemento:\n");
-            printItem(stdout, res);
-        }
+        found = 1;
+        printf("Eliminato il seguente elemento:\n");
+        printItem(stdout, res);
+        ItemDestroy(res);
     }
+
+    if (found == 0) {
+        printf("Nessun elemento trovato tra le date indicate\n");
+    }
+
+    
 }
