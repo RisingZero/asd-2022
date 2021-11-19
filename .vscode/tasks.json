@@ -21,7 +21,7 @@
                     "-g",
                     "${file}",
                     "-o",
-                    "${fileDirname}\\${fileBasenameNoExtension}.out"
+                    "${fileDirname}/${fileBasenameNoExtension}.out"
                 ]
             },
             "group": "build",
@@ -47,7 +47,7 @@
                 "args": [
                     "${file}",
                     "-o",
-                    "${fileDirname}\\${fileBasenameNoExtension}.out"
+                    "${fileDirname}/${fileBasenameNoExtension}.out"
                 ]
             },
             "group": "build",
