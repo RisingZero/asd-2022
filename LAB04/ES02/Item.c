@@ -127,7 +127,7 @@ Key ItemKey(Item val) {
 }
 
 int ItemLt(Key x, Key y) {
-    return (strcmp(x, y) ==  -1);
+    return (strcmp(x, y) <  0);
 }
 
 int ItemEq(Key x, Key y) {
@@ -135,7 +135,7 @@ int ItemEq(Key x, Key y) {
 }
 
 int ItemGt(Key x, Key y) {
-    return (strcmp(x, y) == 1);
+    return (strcmp(x, y) > 0);
 }
 
 void printItem(FILE *fp, Item x) {
