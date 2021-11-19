@@ -80,7 +80,6 @@ void attSelR(int pos, int *sol, int *B_sol, att *val, int N, int *d, int *B_d) {
         }
         return;
     }
-    //TODO: pruning sulle scelte: verifica compatibilità attività
     if (isCompatibile(val, N, pos, sol)) {
         sol[pos] = 1;
         *d += (val[pos].f - val[pos].s);
