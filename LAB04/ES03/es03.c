@@ -7,7 +7,8 @@
 #include <stdlib.h>
 
 #define STONES_TYPES 4
-#define FILENAME "easy_test_set.txt"
+#define FILENAME1 "easy_test_set.txt"
+#define FILENAME2 "hard_test_set.txt"
 
 typedef enum { Z, R, T, S } stoneTypes;
 void longestNecklace(char *stones, int *numStones);
@@ -21,7 +22,8 @@ int main(int argc, char const *argv[])
     char stones[STONES_TYPES] = {'Z', 'R', 'T', 'S'};
     int i, j, n, numStones[STONES_TYPES] = {0};
 
-    if ((fp = fopen(FILENAME, "r")) == NULL) {
+    // EASY TEST SETS
+    if ((fp = fopen(FILENAME1, "r")) == NULL) {
         printf("ERRORE apertura file di input");
         exit(1);
     }
@@ -33,7 +35,21 @@ int main(int argc, char const *argv[])
         printf("%d) ", i);
         longestNecklace(stones, numStones);
     }
+    fclose(fp);
 
+    // HARD TEST SETS
+    if ((fp = fopen(FILENAME2, "r")) == NULL) {
+        printf("ERRORE apertura file di input");
+        exit(1);
+    }
+    fscanf(fp, "%d", &n);
+    for (i = 0; i < n; i++) {
+        for (j = 0; j < STONES_TYPES; j++) {
+            fscanf(fp, "%d", &numStones[j]);
+        }
+        printf("%d) ", i);
+        longestNecklace(stones, numStones);
+    }
     fclose(fp);
 
     return 0;
