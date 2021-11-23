@@ -7,27 +7,34 @@
 #include <stdlib.h>
 
 #define STONES_TYPES 4
+#define FILENAME "easy_test_set.txt"
 
 typedef enum { Z, R, T, S } stoneTypes;
 void longestNecklace(char *stones, int *numStones);
 int longestNecklaceR(int pos, int *sol, int k, int *numStones);
 int check(int *sol, int k);
+void printNecklace(int *sol, int k, char *stones);
 
 int main(int argc, char const *argv[])
 {
+    FILE *fp;
     char stones[STONES_TYPES] = {'Z', 'R', 'T', 'S'};
-    int i, numStones[STONES_TYPES] = {0};
+    int i, j, n, numStones[STONES_TYPES] = {0};
 
-    if (argc != STONES_TYPES+1) {
-        printf("Specificare il numero di pietre nell'ordine: Z R T S\n");
+    if ((fp = fopen(FILENAME, "r")) == NULL) {
+        printf("ERRORE apertura file di input");
         exit(1);
     }
-
-    for (i = 0; i < STONES_TYPES; i++) {
-        numStones[i] = atoi(argv[i+1]);
+    fscanf(fp, "%d", &n);
+    for (i = 0; i < n; i++) {
+        for (j = 0; j < STONES_TYPES; j++) {
+            fscanf(fp, "%d", &numStones[j]);
+        }
+        printf("%d) ", i);
+        longestNecklace(stones, numStones);
     }
 
-    longestNecklace(stones, numStones);
+    fclose(fp);
 
     return 0;
 }
@@ -48,11 +55,7 @@ void longestNecklace(char *stones, int *numStones) {
     }
     k++;
     if (found) {
-        printf("Migliore soluzione:\n");
-        for (i = 0; i < k; i++) {
-            printf("%c ", stones[sol[i]]);
-        }
-        printf("\nLunghezza: %d\n", k);
+        printNecklace(sol, k, stones);
     } else {
         printf("Nessuna soluzione compatibile trovata\n");
     }
@@ -66,12 +69,20 @@ int longestNecklaceR(int pos, int *sol, int k, int *numStones) {
 
     // Terminal condition
     if (pos >= k) {
-        if (check(sol, k))
-            return 1;
+       return 1;
     }
 
     for (i = 0; i < STONES_TYPES; i++) {
         if (numStones[i] > 0) {
+            if (pos > 0) {
+                if (sol[pos-1] == Z || sol[pos-1] == T) {
+                    if (i != Z && i != R)
+                        continue;
+                } else if (sol[pos-1] == R || sol[pos-1] == S) {
+                    if (i != S && i != T)
+                        continue;
+                }
+            }
             sol[pos] = i;
             numStones[i]--;
             if (longestNecklaceR(pos+1, sol, k, numStones))
@@ -89,26 +100,23 @@ int check(int *sol, int k) {
 
     for (i = 0; i < k-1 && ok; i++) {
         stone = sol[i];
-        switch (stone) {
-            case Z:
-                if (sol[i+1] != Z || sol[i+1] != R)
-                    ok = 0;
-                break;
-            case R:
-                if (sol[i+1] != S || sol[i+1] != T)
-                    ok = 0;
-                break;
-            case T:
-                if (sol[i+1] != Z || sol[i+1] != R)
-                    ok = 0;
-                break;
-            case S:
-                if (sol[i+1] != S || sol[i+1] != T)
-                    ok = 0;
-                break;
-            default:
-                break;
+        if (stone == Z || stone == T) {
+            if (sol[i+1] != Z && sol[i+1] != R)
+                ok = 0;
+        } else if (stone == R || stone == S) {
+            if (sol[i+1] != S && sol[i+1] != T)
+                ok = 0;
         }
     }
     return ok;
+}
+
+void printNecklace(int *sol, int k, char *stones) {
+    int i;
+
+    printf("Migliore soluzione: ");
+    for (i = 0; i < k; i++) {
+        printf("%c ", stones[sol[i]]);
+    }
+    printf("\nLunghezza: %d\n", k);
 }
