@@ -180,21 +180,6 @@ void showConfiguration(Cell **board, int R, int C, Tile *tiles, int N) {
     
     for (i = 0; i < R; i++) {
         for (j = 0; j < C; j++) {
-            /* if (board[i][j].rot == 0) {
-                printf("%c %d | %c %d   ", 
-                    tiles[board[i][j].id].C1,
-                    tiles[board[i][j].id].V1,
-                    tiles[board[i][j].id].C2,
-                    tiles[board[i][j].id].V2
-                );
-            } else {
-                printf("%c %d | %c %d   ", 
-                    tiles[board[i][j].id].C2,
-                    tiles[board[i][j].id].V2,
-                    tiles[board[i][j].id].C1,
-                    tiles[board[i][j].id].V1
-                );
-            } */
             printf("%d/%d ", board[i][j].id, board[i][j].rot);
         }
         printf("\n");
