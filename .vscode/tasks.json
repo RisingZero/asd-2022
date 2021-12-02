@@ -10,15 +10,18 @@
                 "command": "C:\\Program Files\\mingw-w64\\x86_64-8.1.0-posix-seh-rt_v6-rev0\\mingw64\\bin\\gcc.exe",
                 "args": [
                     "-g",
-                    "${file}",
+                    "${fileDirname}\\*.c",
                     "-o",
                     "${fileDirname}\\${fileBasenameNoExtension}.exe"
                 ],
             },
             "osx": {
-                "command": "",
+                "command": "gcc",
                 "args": [
-
+                    "-g",
+                    "${file}",
+                    "-o",
+                    "${fileDirname}/${fileBasenameNoExtension}.out"
                 ]
             },
             "group": "build",
@@ -34,15 +37,17 @@
             "windows": {
                 "command": "C:\\Program Files\\mingw-w64\\x86_64-8.1.0-posix-seh-rt_v6-rev0\\mingw64\\bin\\gcc.exe",
                 "args": [
-                    "${file}",
+                    "${fileDirname}\\*.c",
                     "-o",
                     "${fileDirname}\\${fileBasenameNoExtension}.exe"
                 ]
             },
             "osx": {
-                "command": "",
+                "command": "gcc",
                 "args": [
-
+                    "${file}",
+                    "-o",
+                    "${fileDirname}/${fileBasenameNoExtension}.out"
                 ]
             },
             "group": "build",
