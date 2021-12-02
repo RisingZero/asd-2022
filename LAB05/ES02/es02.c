@@ -2,7 +2,6 @@
     LAB05 ES02 RAINERI ANDREA ANGELO S280848
     ALGORITMI E STRUTTURE DATI
  */
-//TODO: aggiungere check heap memory in malloc
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -29,6 +28,8 @@ void findBestConfigurationR(int pos, Cell **board, Cell **b_board, int R, int C,
 int calculatePoints(Cell **board, int R, int C, Tile *tiles, int N);
 void showConfiguration(Cell **board, int R, int C, Tile *tiles, int N);
 
+void free2d(Cell **mat, int nr);
+
 int main(int argc, char const *argv[])
 {
     Cell **board;
@@ -39,6 +40,9 @@ int main(int argc, char const *argv[])
     readBoard(BOARD_FILE, &board, &R, &C, tiles, N);
 
     findBestConfiguration(board, R, C, tiles, N);
+
+    free2d(board, R);
+    free(tiles);
     return 0;
 }
 
@@ -53,7 +57,10 @@ void readTiles(char *file, Tile **tiles, int *N) {
     }
 
     fscanf(fp, "%d", N);
-    *tiles = (Tile *) malloc(*N *sizeof(Tile));
+    if ((*tiles = (Tile *) malloc(*N *sizeof(Tile))) == NULL) {
+        printf("ERRORE memoria esaurita\n");
+        exit(2);
+    }
     fgetc(fp);
 
     for (i = 0; i < *N; i++) {
@@ -74,9 +81,15 @@ void readBoard(char *file, Cell ***board, int *R, int *C, Tile *tiles, int N) {
     }
 
     fscanf(fp, "%d %d", R, C);
-    (*board) = (Cell **) malloc(*R * sizeof(Cell *));
+    if (((*board) = (Cell **) malloc(*R * sizeof(Cell *))) == NULL) {
+        printf("ERRORE memoria esaurita\n");
+        exit(2);
+    }
     for (i = 0; i < *R; i++) {
-        (*board)[i] = (Cell *) malloc(*C * sizeof(Cell));
+        if (((*board)[i] = (Cell *) malloc(*C * sizeof(Cell))) == NULL) {
+            printf("ERRORE memoria esaurita\n");
+            exit(2);
+        }
         for (j = 0; j < *C; j++) {
             fscanf(fp, "%d/%d", &(*board)[i][j].id, &(*board)[i][j].rot);
             if ((*board)[i][j].id != -1)
@@ -91,9 +104,15 @@ void findBestConfiguration(Cell **board, int R, int C, Tile *tiles, int N) {
     Cell **b_board;
 
     // Create best configuration board and copy start configuration
-    b_board = (Cell **) malloc(R * sizeof(Cell *));
+    if ((b_board = (Cell **) malloc(R * sizeof(Cell *))) == NULL) {
+        printf("ERRORE memoria esaurita\n");
+        exit(2);
+    }
     for (i = 0; i < R; i++) {
-        b_board[i] = (Cell *) malloc(C * sizeof(Cell));
+        if ((b_board[i] = (Cell *) malloc(C * sizeof(Cell))) == NULL) {
+            printf("ERRORE memoria esaurita\n");
+            exit(2);
+        }
         for (j = 0; j < C; j++) {
             b_board[i][j] = board[i][j];
         }
@@ -105,6 +124,8 @@ void findBestConfiguration(Cell **board, int R, int C, Tile *tiles, int N) {
 
     // Show found best configuration
     showConfiguration(b_board, R, C, tiles, N);
+
+    free2d(b_board, R);
 }
 
 void findBestConfigurationR(int pos, Cell **board, Cell **b_board, int R, int C, Tile *tiles, int N, int *b_point) {
@@ -194,4 +215,13 @@ void showConfiguration(Cell **board, int R, int C, Tile *tiles, int N) {
         }
         printf("\n");
     }
+}
+
+void free2d(Cell **mat, int nr) {
+    int i;
+
+    for (i = 0; i < nr; i++) {
+        free(mat[i]);
+    }
+    free(mat);
 }
