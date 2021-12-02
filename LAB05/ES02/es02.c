@@ -2,12 +2,14 @@
     LAB05 ES02 RAINERI ANDREA ANGELO S280848
     ALGORITMI E STRUTTURE DATI
  */
+//TODO: aggiungere check heap memory in malloc
 
 #include <stdio.h>
 #include <stdlib.h>
 
 #define TILES_FILE "tiles.txt"
 #define BOARD_FILE "board.txt"
+#define BUFF_SIZE 1024
 
 typedef struct tile_s {
     int id, used;
@@ -43,6 +45,7 @@ int main(int argc, char const *argv[])
 void readTiles(char *file, Tile **tiles, int *N) {
     FILE *fp;
     int i;
+    char buffer[BUFF_SIZE];
 
     if (((fp = fopen(file, "r")) == NULL)) {
         printf("ERRORE apertura file input\n");
@@ -51,11 +54,14 @@ void readTiles(char *file, Tile **tiles, int *N) {
 
     fscanf(fp, "%d", N);
     *tiles = (Tile *) malloc(*N *sizeof(Tile));
+    fgetc(fp);
 
     for (i = 0; i < *N; i++) {
         (*tiles)[i].id = i; (*tiles)[i].used = 0;
-        fscanf(fp, "%c %d %c %d", &(*tiles)[i].C1, &(*tiles)[i].V1, &(*tiles)[i].C2, &(*tiles)[i].V2);
+        fgets(buffer, BUFF_SIZE, fp);
+        sscanf(buffer, "%c %d %c %d", &(*tiles)[i].C1, &(*tiles)[i].V1, &(*tiles)[i].C2, &(*tiles)[i].V2);
     }
+    fclose(fp);
 }
 
 void readBoard(char *file, Cell ***board, int *R, int *C, Tile *tiles, int N) {
@@ -74,9 +80,10 @@ void readBoard(char *file, Cell ***board, int *R, int *C, Tile *tiles, int N) {
         for (j = 0; j < *C; j++) {
             fscanf(fp, "%d/%d", &(*board)[i][j].id, &(*board)[i][j].rot);
             if ((*board)[i][j].id != -1)
-                tiles[(*board)[i][j].id].id = 1;
+                tiles[(*board)[i][j].id].used = 1;
         }
     }
+    fclose(fp);
 }
 
 void findBestConfiguration(Cell **board, int R, int C, Tile *tiles, int N) {
@@ -94,6 +101,8 @@ void findBestConfiguration(Cell **board, int R, int C, Tile *tiles, int N) {
 
     findBestConfigurationR(0, board, b_board, R, C, tiles, N, &b_point);
 
+    printf("Best configuration: %d\n", b_point);
+
     // Show found best configuration
     showConfiguration(b_board, R, C, tiles, N);
 }
@@ -102,9 +111,8 @@ void findBestConfigurationR(int pos, Cell **board, Cell **b_board, int R, int C,
     int i, points;
     int r, c;
 
-    if (pos >= (R-1)*(C-1)) {
+    if (pos >= R*C) {
         points = calculatePoints(board, R, C, tiles, N);
-        printf("punti: %d\n", points);
         if (points > *b_point) {
             for (r = 0; r < R; r++) {
                 for (c = 0; c < C; c++) {
@@ -112,13 +120,14 @@ void findBestConfigurationR(int pos, Cell **board, Cell **b_board, int R, int C,
                     b_board[r][c].rot = board[r][c].rot;
                 }
             }
+            *b_point = points;
         }
         return;
     }
 
     r = pos/C; c = pos%C;
     // Cell already filled by default start configuration
-    if (board[r][c].id == -1 && board[r][c].rot == -1) {
+    if (board[r][c].id != -1 && board[r][c].rot != -1) {
         findBestConfigurationR(pos+1, board, b_board, R, C, tiles, N, b_point);
         return;
     }
@@ -137,11 +146,12 @@ void findBestConfigurationR(int pos, Cell **board, Cell **b_board, int R, int C,
             findBestConfigurationR(pos+1, board, b_board, R, C, tiles, N, b_point);
             // backtrack
             tiles[i].used = 0;
+            board[r][c].id = -1;
+            board[r][c].rot = -1;
         }
     }
 }
 
-// TODO: check function : always 0 result
 int calculatePoints(Cell **board, int R, int C, Tile *tiles, int N) {
     int i, j, points = 0, partialPts, valid;
     char color;
@@ -163,9 +173,9 @@ int calculatePoints(Cell **board, int R, int C, Tile *tiles, int N) {
     for (j = 0; j < C; j++) {
         valid = 1; partialPts = 0;
         color = (board[0][j].rot == 0) ? tiles[board[0][j].id].C2 : tiles[board[0][j].id].C1;
-        for (i = 0; i < C && valid; i++) {
+        for (i = 0; i < R && valid; i++) {
             partialPts += ((board[i][j].rot == 0) ? tiles[board[i][j].id].V2 : tiles[board[i][j].id].V1);
-            if (((board[0][j].rot == 0) ? tiles[board[i][j].id].C2 : tiles[board[i][j].id].C1) != color)
+            if (((board[i][j].rot == 0) ? tiles[board[i][j].id].C2 : tiles[board[i][j].id].C1) != color)
                 valid = 0;
         }
         if (valid)
