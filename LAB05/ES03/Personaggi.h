@@ -19,7 +19,7 @@
 
 typedef struct {
     inv_t *inUso;
-    inv_t vettEq[MAX_EQUIP];
+    inv_t *vettEq[MAX_EQUIP];
 } tabEquip_t;
 
 typedef struct {
@@ -44,15 +44,21 @@ typedef struct {
     int nPg;
 } tabPg_t;
 
+typedef enum { add, rm, use } equip_t;
+
 /* Function prototypes */
 
 void LISTcreate(void);
 void LISTfree(void);
 void leggiPersonaggi(char *filename);
+pg_t PGscan(char *input);
 void PGinsert(pg_t pg);
 void PGdelete(pgKey_t key);
 pg_t PGsearch(pgKey_t key);
+int PGisEmpty(pg_t pg);
 void PGprint(pg_t pg, int single);
-void LISTprint();
+void LISTprint(int plus);
+int PGequip(pg_t pg, inv_t *obj, equip_t type);
+void PGEquipShow(pg_t pg);
 
 #endif

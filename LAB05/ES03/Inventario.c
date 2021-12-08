@@ -27,7 +27,11 @@ static inv_t OGGETTOempty(void) {
     return obj;
 }
 
-static int INVKEYcompare(invKey_t key1, invKey_t key2) {
+invKey_t INVKEYget(inv_t *obj) {
+    return obj->nome;
+}
+
+int INVKEYcompare(invKey_t key1, invKey_t key2) {
     return (strcmp(key1, key2) == 0);
 }
 
@@ -96,13 +100,13 @@ void INVprint(void) {
     }
 } 
 
-inv_t OGGETTOsearch(invKey_t key) {
+inv_t *OGGETTOsearch(invKey_t key) {
     int i;
 
     for (i = 0; i < inventario->nInv; i++) {
         if (INVKEYcompare(inventario->vettInv[i].nome, key)) {
-            return inventario->vettInv[i];
+            return &(inventario->vettInv[i]);
         }
     }
-    return OGGETTOempty();
+    return NULL;
 }

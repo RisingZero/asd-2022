@@ -35,9 +35,11 @@ typedef struct {
 
 void INVcreate(void);
 void INVfree(void);
+invKey_t INVKEYget(inv_t *obj);
+int INVKEYcompare(invKey_t key1, invKey_t key2);
 void leggiInventario(char *filename);
 void INVprint(void);
-inv_t OGGETTOsearch(invKey_t key);
+inv_t* OGGETTOsearch(invKey_t key);
 void OGGETTOprint(inv_t obj, int single);
 
 #endif

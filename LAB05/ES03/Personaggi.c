@@ -6,8 +6,9 @@
 tabPg_t *personaggi;
 char buffer[PG_BUFF_SIZE];
 
-static pg_t PGscan(char *input) {
+pg_t PGscan(char *input) {
     pg_t pg;
+    int i;
 
     sscanf(input, "PG%d %s %s %d %d %d %d %d %d",
         &pg.codice,
@@ -24,6 +25,10 @@ static pg_t PGscan(char *input) {
     if ((pg.equip = (tabEquip_t*) malloc(sizeof(tabEquip_t))) == NULL) {
         printf("ERRORE memoria esaurita");
         exit(2);
+    }
+    pg.equip->inUso = NULL;
+    for (i = 0; i < MAX_EQUIP; i++) {
+        pg.equip->vettEq[i] = NULL;
     }
 
     return pg;
@@ -120,10 +125,23 @@ void PGinsert(pg_t pg){
 void PGdelete(pgKey_t key){
     link t, p;
 
-    for (t = personaggi->headPg, p = NULL; t->next == NULL; p = t, t = t-> next) {
+    // Check head
+    if (PGKEYcompare(personaggi->headPg->pg.codice, key)) {
+        t = personaggi->headPg;
+        personaggi->headPg = personaggi->headPg->next;
+        PGfree(t);
+        personaggi->nPg--;
+    }
+
+    // Find in middle
+    for (p = personaggi->headPg, t = p->next; t != personaggi->tailPg->next; p = t, t = t->next) {
         if (PGKEYcompare(t->pg.codice, key)) {
             p->next = t->next;
+            if (t == personaggi->tailPg) {
+                personaggi->tailPg = p;
+            }
             PGfree(t);
+            personaggi->nPg--;
         }
     }
 }
@@ -131,13 +149,17 @@ void PGdelete(pgKey_t key){
 pg_t PGsearch(pgKey_t key){
     link t;
 
-    for (t = personaggi->headPg; t->next != NULL; t = t->next) {
+    for (t = personaggi->headPg; t != personaggi->tailPg->next; t = t->next) {
         if (PGKEYcompare(t->pg.codice, key)) {
             return t->pg;
         }
     }
 
     return PGempty();
+}
+
+int PGisEmpty(pg_t pg) {
+    return pg.codice == 0;
 }
 
 void PGprint(pg_t pg, int single) {
@@ -152,15 +174,117 @@ void PGprint(pg_t pg, int single) {
     );
 }
 
-static void LISTprintR(link h) {
+void PGprintPlus(pg_t pg, int single) {
+    int _hp, _mp, _atk, _def, _mag, _spr, i;
+
+    _hp = _mp = _atk = _def = _mag = _spr = 0;
+
+    for (i = 0; i < MAX_EQUIP; i++) {
+        if (pg.equip->vettEq[i] != NULL) {
+            _hp += pg.equip->vettEq[i]->stat.hp;
+            _mp += pg.equip->vettEq[i]->stat.mp;
+            _atk += pg.equip->vettEq[i]->stat.atk;
+            _def += pg.equip->vettEq[i]->stat.def;
+            _mag += pg.equip->vettEq[i]->stat.mag;
+            _spr += pg.equip->vettEq[i]->stat.spr;
+        }
+    }
+
+    if (single) {
+        printf("%6s | %-50s | %-50s | %4s | %4s | %4s | %4s | %4s | %4s\n",
+            "CODICE", "NOME", "CLASSE", "HP", "MP", "ATK", "DEF", "MAG", "SPR"
+        );
+    }
+
+    printf("PG%04d | %-50s | %-50s | %4d | %4d | %4d | %4d | %4d | %4d\n",
+        pg.codice, pg.nome, pg.classe, 
+        ((pg.stat.hp + _hp) > 0 ? (pg.stat.hp + _hp) : 0), 
+        ((pg.stat.mp + _mp) > 0 ? (pg.stat.mp + _mp) : 0),
+        ((pg.stat.atk + _atk) > 0 ? (pg.stat.atk + _atk) : 0),
+        ((pg.stat.def + _def) > 0 ? (pg.stat.def + _def) : 0),
+        ((pg.stat.mag + _mag) > 0 ? (pg.stat.mag + _mag) : 0),
+        ((pg.stat.spr + _spr) > 0 ? (pg.stat.spr + _spr) : 0)
+    );
+}
+
+
+static void LISTprintR(link h, int plus) {
     if (h == NULL)
         return;
-    PGprint(h->pg, 0);
-    LISTprintR(h->next);
+    if (plus)
+        PGprintPlus(h->pg, 0);
+    else
+        PGprint(h->pg, 0);
+    LISTprintR(h->next, plus);
 }
-void LISTprint() {
+void LISTprint(int plus) {
     printf("%6s | %-50s | %-50s | %4s | %4s | %4s | %4s | %4s | %4s\n",
         "CODICE", "NOME", "CLASSE", "HP", "MP", "ATK", "DEF", "MAG", "SPR"
     );
-    LISTprintR(personaggi->headPg);
+    LISTprintR(personaggi->headPg, plus);
+}
+
+int PGequip(pg_t pg, inv_t *obj, equip_t type) {
+    int i, isPresent = 0;
+    // Check obj presence in pg current inv
+    for (i = 0; i < MAX_EQUIP; i++) {
+        if (pg.equip->vettEq[i] != NULL && INVKEYcompare(INVKEYget(obj),INVKEYget(pg.equip->vettEq[i]))) {
+            isPresent = 1;
+        }
+    }
+
+    switch (type) {
+        case add:
+            if (isPresent) {
+                printf("ATTENZIONE: l'oggetto indicato è già presente nell'equipaggiamento del personaggio!\n");
+                return 0;
+            }
+            i = 0;
+            while (i < MAX_EQUIP && pg.equip->vettEq[i] != NULL) {i++;}
+            if (i < MAX_EQUIP) {
+                pg.equip->vettEq[i] = obj;
+                return 1;
+            } else {
+                printf("ATTENZIONE: non ci sono slot disponibili!\n");
+                return 0;
+            }
+            break;
+        case rm:
+            if (!isPresent) {
+                printf("ATTENZIONE: l'oggetto indicato non è presente nell'equipaggiamento del personaggio!\n");
+                return 0;
+            }
+            i = 0;
+            while (!INVKEYcompare(INVKEYget(obj),INVKEYget(pg.equip->vettEq[i]))){i++;}
+            if (pg.equip->inUso == pg.equip->vettEq[i])
+                pg.equip->inUso = NULL;
+            pg.equip->vettEq[i] = NULL;
+            return 1;
+            break;
+        case use:
+            if (!isPresent) {
+                printf("ATTENZIONE: l'oggetto indicato non è presente nell'equipaggiamento del personaggio!\n");
+                return 0;
+            }
+            pg.equip->inUso = obj;
+            return 1;
+            break;
+        default:
+            return 0;
+            break;
+    }
+    return 0;
+}
+
+void PGEquipShow(pg_t pg) {
+    int i;
+
+    for (i = 0; i < MAX_EQUIP; i++) {
+        if (pg.equip->vettEq[i] != NULL) {
+            OGGETTOprint(*(pg.equip->vettEq[i]), i==0);
+            if (pg.equip->vettEq[i] == pg.equip->inUso) {
+                printf("^^^ IN USO ^^^\n");
+            }
+        }
+    }
 }
