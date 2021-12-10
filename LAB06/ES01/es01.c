@@ -29,6 +29,17 @@ int compatibile(att x, att y);
 void bestActivitySequence(int N, att *v);
 void stampaSoluzione(att *v, int *prev, int lastAtt);
 
+void stampaVettore(att *val, int N) {   
+    int i;
+
+    for (i = 0; i < N; i++) {
+        
+            printf("(%d %d) ", val[i].s, val[i].f);
+        
+    }
+    printf("\n");
+}
+
 int main(int argc, char const *argv[])
 {
     att *val;
@@ -68,7 +79,22 @@ void readFile(att **val, int *N, char *filename) {
 }
 
 void ordAtt(int N, att *v) {
-    
+    att tmp;
+    int i, j;
+    int minT, minIdx;
+
+    for (i = 0; i < N-1; i++) {
+        minT = v[i].s; minIdx = i;
+        for (j = i+1; j < N; j++) {
+            if (v[j].s < minT) {
+                minT = v[j].s;
+                minIdx = j;
+            }
+        }
+        tmp = v[i];
+        v[i] = v[minIdx];
+        v[minIdx] = tmp;
+    }
 }
 
 int compatibile(att x, att y) {
@@ -79,11 +105,11 @@ void bestActivitySequence(int N, att *v) {
     int *time, *prev;
     int i, j, best = 0, lastAtt = -1;
 
-    if ((time = (int*) malloc(sizeof(int))) == NULL) {
+    if ((time = (int*) malloc(N*sizeof(int))) == NULL) {
         printf("ERRORE memoria esaurita");
         exit(2);
     }
-    if ((prev = (int*) malloc(sizeof(int))) == NULL) {
+    if ((prev = (int*) malloc(N*sizeof(int))) == NULL) {
         printf("ERRORE memoria esaurita");
         exit(2);
     }
@@ -115,7 +141,6 @@ void stampaSoluzione(att *v, int *prev, int lastAtt) {
         printf("\n");
         return;
     }
-
-    stampaSoluzione(v, prev, prev[lastAtt]);
+    stampaSoluzione(v, prev, prev[lastAtt]);    
     printf("(%d, %d) ", v[lastAtt].s, v[lastAtt].f);
 }
