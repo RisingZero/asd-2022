@@ -3,8 +3,8 @@
 #include <string.h>
 #include "Personaggi.h"
 
-tabPg_t *personaggi;
-char buffer[PG_BUFF_SIZE];
+static tabPg_t *personaggi;
+static char buffer[PG_BUFF_SIZE];
 
 pg_t PGscan(char *input) {
     pg_t pg;

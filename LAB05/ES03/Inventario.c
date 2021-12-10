@@ -3,8 +3,8 @@
 #include <string.h>
 #include "Inventario.h"
 
-tabInv_t *inventario;
-char buffer[INV_BUFF_SIZE];
+static tabInv_t *inventario;
+static char buffer[INV_BUFF_SIZE];
 
 void OGGETTOprint(inv_t obj, int single) {
     if (single) {
