@@ -1,3 +1,8 @@
+/* 
+    LAB06 ES03 RAINERI ANDREA ANGELO S280848
+    ALGORITMI E STRUTTURE DATI A.A.2021/22
+ */
+
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -7,7 +12,7 @@
 #include "pg.h"
 
 #define N_SCELTE 7
-#define DBG 0
+#define DBG 1
 
 enum { falso, vero };
 typedef int bool;
@@ -44,7 +49,7 @@ int main(int argc, char **argv) {
   pgList_read(fin, pgList);
   fclose(fin);
 #if DBG
-  pgList_print(stdout, pgList);
+  pgList_print(stdout, pgList, invArray);
 #endif /* DBG */
 
   fin = fopen("inventario.txt","r");

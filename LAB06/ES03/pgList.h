@@ -25,6 +25,4 @@ void pgList_remove(pgList_t pgList, char* cod);
 /* ricerca per codice, ritornando il puntatore */
 pg_t *pgList_searchByCode(pgList_t pgList, char* cod);
 
-/* Si possono aggiungere altre funzioni se ritenute necessarie */
-
 #endif

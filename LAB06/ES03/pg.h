@@ -6,6 +6,8 @@
 #include <stdio.h>
 
 #include "equipArray.h"
+#include "invArray.h"
+#include "inv.h"
 
 /* quasi ADT personaggio; si noti che si tratta di un composto con riferimento 
 a un equipArray di proprieta' */
@@ -27,6 +29,8 @@ void pg_print(FILE *fp, pg_t *pgp, invArray_t invArray);
 di fatto e' sufficiente chiamare l'opportuna funzione dal modulo equipArray */
 void pg_updateEquip(pg_t *pgp, invArray_t invArray);
 
-/* Si possono aggiungere altre funzioni se ritenute necessarie */
+void pg_header(FILE *fp); 
+
+int pg_compare_code(pg_t pg, char *cod);
 
 #endif
