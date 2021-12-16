@@ -24,8 +24,20 @@ void pg_print(FILE *fp, pg_t *pgp, invArray_t invArray) {
 }
 
 void pg_updateEquip(pg_t *pgp, invArray_t invArray) {
+    int i, idxObj;
+    stat_t temp_stat;
+    inv_t *temp_inv;
+
+    stat_zeroed(&temp_stat);
+
+    equipArray_print(stdout, pgp->equip, invArray);
     equipArray_update(pgp->equip, invArray);
-    // TODO: implementation of eq_stat update after equipUpdate
+    for (i = 0; i < equipArray_inUse(pgp->equip); i++) {
+        idxObj = equipArray_getEquipByIndex(pgp->equip, i);
+        temp_inv = invArray_getByIndex(invArray, idxObj);
+        temp_stat = stat_combine(temp_stat, inv_getStat(temp_inv));
+    }
+    pgp->eq_stat = temp_stat;
 }
 
 void pg_header(FILE *fp) {
