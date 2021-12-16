@@ -26,7 +26,7 @@ pg_t PGscan(char *input) {
         printf("ERRORE memoria esaurita");
         exit(2);
     }
-    pg.equip->inUso = NULL;
+    pg.equip->inUso = 0;
     for (i = 0; i < MAX_EQUIP; i++) {
         pg.equip->vettEq[i] = NULL;
     }
@@ -243,6 +243,7 @@ int PGequip(pg_t pg, inv_t *obj, equip_t type) {
             while (i < MAX_EQUIP && pg.equip->vettEq[i] != NULL) {i++;}
             if (i < MAX_EQUIP) {
                 pg.equip->vettEq[i] = obj;
+                pg.equip->inUso++;
                 return 1;
             } else {
                 printf("ATTENZIONE: non ci sono slot disponibili!\n");
@@ -256,17 +257,8 @@ int PGequip(pg_t pg, inv_t *obj, equip_t type) {
             }
             i = 0;
             while (!INVKEYcompare(INVKEYget(obj),INVKEYget(pg.equip->vettEq[i]))){i++;}
-            if (pg.equip->inUso == pg.equip->vettEq[i])
-                pg.equip->inUso = NULL;
             pg.equip->vettEq[i] = NULL;
-            return 1;
-            break;
-        case use:
-            if (!isPresent) {
-                printf("ATTENZIONE: l'oggetto indicato non è presente nell'equipaggiamento del personaggio!\n");
-                return 0;
-            }
-            pg.equip->inUso = obj;
+            pg.equip->inUso--;
             return 1;
             break;
         default:
@@ -279,12 +271,13 @@ int PGequip(pg_t pg, inv_t *obj, equip_t type) {
 void PGEquipShow(pg_t pg) {
     int i;
 
+    if (pg.equip->inUso == 0) {
+        printf("Nessun equipaggiamento\n");
+        return;
+    }
     for (i = 0; i < MAX_EQUIP; i++) {
         if (pg.equip->vettEq[i] != NULL) {
             OGGETTOprint(*(pg.equip->vettEq[i]), i==0);
-            if (pg.equip->vettEq[i] == pg.equip->inUso) {
-                printf("^^^ IN USO ^^^\n");
-            }
         }
     }
 }

@@ -18,7 +18,7 @@
 /* Type definitions */
 
 typedef struct {
-    inv_t *inUso;
+    int inUso;
     inv_t *vettEq[MAX_EQUIP];
 } tabEquip_t;
 

@@ -158,7 +158,7 @@ void handlePGequip() {
     
     valid = 0;
     do {
-        printf("Operazione da eseguire: (ADD - RM - USE) --> ");
+        printf("Operazione da eseguire: (ADD - RM) --> ");
         scanf("%s", buffer);
 
         if (strcmp(buffer, "ADD") == 0) {
@@ -181,17 +181,6 @@ void handlePGequip() {
                 return;
             }
             if (!PGequip(pg, obj, rm))
-                printf("ERRORE, qualcosa è andato storto\n");
-        } else if (strcmp(buffer, "USE") == 0) {
-            valid = 1;
-            INVprint();
-            printf("\nIndica il nome dell'oggetto da mettere in uso:\n--> ");
-            scanf("%s", buffer);
-            if ((obj = OGGETTOsearch(buffer)) == NULL) {
-                printf("ERRORE, l'oggetto indicato non esiste\n");
-                return;
-            }            
-            if (!PGequip(pg, obj, use))
                 printf("ERRORE, qualcosa è andato storto\n");
         } else {
             printf("ERRORE: opzione non disponibile!\n");
