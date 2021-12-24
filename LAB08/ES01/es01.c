@@ -118,7 +118,9 @@ void handleRead(AssetList assetList) {
     fscanf(fp, "%d", &N);
     for (i = 0; i < N; i++) {
         tmpAsset = Asset_scan(fp);
-        AssetList_insert(assetList, tmpAsset);
+        if (AssetList_insert(assetList, tmpAsset)) {
+            Asset_free(tmpAsset);
+        }
     }
 
     fclose(fp);
@@ -135,7 +137,9 @@ void handleAssetSelection(AssetList assetList, Asset **selectedAsset) {
         printf("Select an asset: ");
         scanf("%d", &idx);
 
-        *selectedAsset = AssetList_getByIndex(assetList, idx);
+        if ((*selectedAsset = AssetList_getByIndex(assetList, idx)) == NULL) {
+            printf("Asset not found!\n");
+        }
     }
 
 }

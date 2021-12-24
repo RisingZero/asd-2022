@@ -18,7 +18,7 @@ void AssetList_free(AssetList assetList);
 void AssetList_show(FILE *fp, AssetList assetList);
 int AssetList_isEmpty(AssetList assetList);
 
-void AssetList_insert(AssetList assetList, Asset asset);
+int AssetList_insert(AssetList assetList, Asset asset);
 
 Asset *AssetList_getByIndex(AssetList assetList, int index);
 #endif

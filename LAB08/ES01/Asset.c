@@ -30,8 +30,8 @@ Asset Asset_scan(FILE *fp) {
     return asset;
 }
 
-void Asset_printShort(FILE *fp, Asset asset) {
-    fprintf(fp, "%s\n", asset->code);
+void Asset_printShort(FILE *fp, Asset asset, int cnt) {
+    fprintf(fp, "%d - %s\n", cnt, asset->code);
 }
 
 AssetKey Asset_getKey(Asset t) {

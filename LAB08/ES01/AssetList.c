@@ -12,7 +12,7 @@ struct asset_list_ {
 };
 
 AssetList AssetList_init() {
-    AssetList list = (AssetList) malloc(sizeof (*list));
+    AssetList list = (AssetList) malloc(sizeof(*list));
     list->headP = NULL;
     list->N = 0;
 
@@ -40,16 +40,22 @@ static link NEW(Asset asset, link next) {
     return p;
 }
 
-static void showR(FILE *fp, link p) {
-    Asset_printShort(fp, p->asset);
-    showR(fp, p->next);
+static void showR(FILE *fp, link p, int *cnt) {
+    if (p == NULL)
+        return;
+    
+    Asset_printShort(fp, p->asset, *cnt);
+    (*cnt)++;
+    showR(fp, p->next, cnt);
 }
 
 void AssetList_show(FILE *fp, AssetList assetList) {
+    int cnt = 0;
+
     if (assetList->N == 0) {
         printf("No assets\n");
     } else {
-        showR(fp, assetList->headP);
+        showR(fp, assetList->headP, &cnt);
     }
 }
 
@@ -57,18 +63,32 @@ int AssetList_isEmpty(AssetList assetList) {
     return assetList->N == 0;
 }
 
-void AssetList_insert(AssetList assetList, Asset asset) {
-    link *xp, t;
+int AssetList_insert(AssetList assetList, Asset asset) {
+    link p, t;
 
-    for (*xp = assetList->headP; *xp != NULL; xp = &((*xp)->next)) {
-        if (Asset_KeyCompare(Asset_getKey((*xp)->asset), Asset_getKey(asset)) > 0) {
+    if (assetList->headP == NULL || Asset_KeyCompare(Asset_getKey(asset), Asset_getKey(assetList->headP->asset)) < 0) {
+        assetList->headP = NEW(asset, assetList->headP);
+        assetList->N++;
+        return 0;
+    }
+
+    if (Asset_KeyCompare(Asset_getKey(assetList->headP->asset), Asset_getKey(asset)) == 0) {
+        ExrateBST_merge(Asset_getExrates(assetList->headP->asset), Asset_getExrates(asset));
+        return 1;
+    }
+
+    for (p = assetList->headP, t = p->next; t != NULL; p = t,  t = t->next) {
+        if (Asset_KeyCompare(Asset_getKey(t->asset), Asset_getKey(asset)) == 0) {
+            ExrateBST_merge(Asset_getExrates(t->asset), Asset_getExrates(asset));
+            return 1;
+        }
+        if (Asset_KeyCompare(Asset_getKey(t->asset), Asset_getKey(asset)) > 0) {
             break;
         }
     }
-    t = NEW(asset, (*xp)->next);
-    *xp = t;
-
+    p->next = NEW(asset, t);
     assetList->N++;
+    return 0;
 }
 
 Asset *AssetList_getByIndex(AssetList assetList, int index) {

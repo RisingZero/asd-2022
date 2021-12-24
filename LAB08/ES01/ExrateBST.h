@@ -16,6 +16,7 @@ ExrateBST ExrateBST_init();
 void ExrateBST_free(ExrateBST bst);
 
 void ExrateBST_insert(ExrateBST bst, Exrate exrate);
+void ExrateBST_merge(ExrateBST dest, ExrateBST src);
 
 void ExrateBST_balance(ExrateBST bst);
 

@@ -88,6 +88,19 @@ void ExrateBST_insert(ExrateBST bst, Exrate exrate) {
     }
 }
 
+static void mergeR(ExrateBST dest, link r, link z) {
+    if (r == z)
+        return;
+
+    mergeR(dest, r->left, z);
+    mergeR(dest, r->right, z);
+    ExrateBST_insert(dest, r->exrate);
+}
+
+void ExrateBST_merge(ExrateBST dest, ExrateBST src) {
+    mergeR(dest, src->root, src->z);
+}
+
 void ExrateBST_balance(ExrateBST bst) {
     
 }

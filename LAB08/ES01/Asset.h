@@ -20,7 +20,7 @@ Asset Asset_create();
 void Asset_free(Asset asset);
 
 Asset Asset_scan(FILE *fp);
-void Asset_printShort(FILE *fp, Asset asset);
+void Asset_printShort(FILE *fp, Asset asset, int cnt);
 
 AssetKey Asset_getKey(Asset t);
 int Asset_KeyCompare(AssetKey k1, AssetKey k2);
