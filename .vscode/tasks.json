@@ -19,7 +19,7 @@
                 "command": "gcc",
                 "args": [
                     "-g",
-                    "${file}",
+                    "${fileDirname}/*.c",
                     "-o",
                     "${fileDirname}/${fileBasenameNoExtension}.out"
                 ]
@@ -45,7 +45,7 @@
             "osx": {
                 "command": "gcc",
                 "args": [
-                    "${file}",
+                    "${fileDirname}/*.c",
                     "-o",
                     "${fileDirname}/${fileBasenameNoExtension}.out"
                 ]
