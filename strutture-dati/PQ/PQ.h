@@ -18,4 +18,6 @@ Item PQextractMax(PQ pq);
 
 void PQinsert(PQ pq, Item x);
 
+void PQchange(PQ pq, Item x);
+
 #endif
