@@ -39,6 +39,10 @@ int main(int argc, char const *argv[])
     Asset *selectedAsset = NULL;
 
     do {
+        if (selectedAsset != NULL){
+            printf("\n");
+            Asset_printShort(stdout, *selectedAsset, 0);
+        }
         command = readCommand();
         handleCommand(command, assetList, &selectedAsset);
     } while (command != end);
