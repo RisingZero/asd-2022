@@ -20,3 +20,14 @@ Exrate Exrate_null() {
 
     return t;
 }
+
+int Exrate_is_null(Exrate t) {
+    return t.n == 0;
+}
+
+void Exrate_display(FILE *fp, Exrate t) {
+    if (Exrate_is_null(t))
+        return;
+
+    fprintf(fp, "Day %d/%d/%d - Exchange rate: %d\n", t.date.year, t.date.month, t.date.day, t.q);
+}

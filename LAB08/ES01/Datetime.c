@@ -15,3 +15,11 @@ Datetime Datetime_null() {
 
     return date;
 }
+
+Datetime Datetime_read() {
+    Datetime date = Datetime_null();
+    printf("Write a day yyy/mm/dd: ");
+    scanf("%d/%d/%d", &date.year, &date.month, &date.day);
+
+    return date;
+}

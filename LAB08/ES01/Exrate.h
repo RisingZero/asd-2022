@@ -19,4 +19,8 @@ Exrate Exrate_read(FILE *fp);
 
 Exrate Exrate_null();
 
+int Exrate_is_null(Exrate t);
+
+void Exrate_display(FILE *fp, Exrate t);
+
 #endif

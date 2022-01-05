@@ -13,4 +13,6 @@ int compareDate(Datetime a, Datetime b);
 
 Datetime Datetime_null();
 
+Datetime Datetime_read();
+
 #endif

@@ -43,7 +43,7 @@ static link searchR(link h, Datetime date, link z) {
     int cmp;
 
     if (h == z)
-        return NULL;
+        return z;
 
     cmp = compareDate(date, h->exrate.date);
     if (cmp == 0)
@@ -60,26 +60,27 @@ static link ExrateBST_getByDate(ExrateBST bst, Datetime date) {
 }
 
 static void ExrateBST_insertLeaf(ExrateBST bst, Exrate exrate) {
-    link tp = bst->root;
+    link *tp = &(bst->root);
 
     if (bst->root == bst->z) {
         bst->root = NEW(exrate, bst->z, bst->z);
+        return;
     }
 
-    while (tp != bst->z) {
-        if (compareDate(tp->exrate.date, exrate.date) > 0)
-            tp = tp->left;
+    while (*tp != bst->z) {
+        if (compareDate((*tp)->exrate.date, exrate.date) > 0)
+            tp = &((*tp)->left);
         else
-            tp = tp->right;
+            tp = &((*tp)->right);
     }
-    tp = NEW(exrate, bst->z, bst->z);
+    *tp = NEW(exrate, bst->z, bst->z);
 }
 
 void ExrateBST_insert(ExrateBST bst, Exrate exrate) {
     link tp;
     int tempQ;
 
-    if ((tp = ExrateBST_getByDate(bst, exrate.date)) != NULL) {
+    if ((tp = ExrateBST_getByDate(bst, exrate.date)) != bst->z) {
         tempQ  = ((tp->exrate.n * tp->exrate.q) + (exrate.n * exrate.q))/(tp->exrate.n + exrate.n);
         tp->exrate.q = tempQ;
         tp->exrate.n += exrate.n;
@@ -105,3 +106,23 @@ void ExrateBST_balance(ExrateBST bst) {
     
 }
 
+Exrate ExrateBST_search(ExrateBST bst, Datetime date) {
+    link t = ExrateBST_getByDate(bst, date);
+    if (t != bst->z)
+        return t->exrate;
+    else
+        return Exrate_null();
+}
+
+static link visitInOrderCheckInterval(link h, Datetime date1, Datetime date2, int withInterval, link z) {
+    if (h == z) return;
+
+    visitInOrderCheckInterval(h->left, date1, date2, withInterval, z);
+    if ((withInterval && compareDate(h->exrate.date, date1) >= 0 && compareDate(h->exrate.date, date2) <= 0) || !withInterval)
+        Exrate_display(stdout, h->exrate);
+    visitInOrderCheckInterval(h->right, date1, date2, withInterval, z);
+}
+
+void ExrateBST_showAllInInterval(ExrateBST bst, Datetime date1, Datetime date2, int withInterval) {
+    visitInOrderCheckInterval(bst->root, date1, date2, withInterval, bst->z);
+}

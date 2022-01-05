@@ -20,4 +20,8 @@ void ExrateBST_merge(ExrateBST dest, ExrateBST src);
 
 void ExrateBST_balance(ExrateBST bst);
 
+Exrate ExrateBST_search(ExrateBST bst, Datetime date);
+
+void ExrateBST_showAllInInterval(ExrateBST bst, Datetime date1, Datetime date2, int withInterval);
+
 #endif

@@ -40,7 +40,7 @@ int main(int argc, char const *argv[])
 
     do {
         if (selectedAsset != NULL){
-            printf("\n");
+            printf("\nSelected asset: ");
             Asset_printShort(stdout, *selectedAsset, 0);
         }
         command = readCommand();
@@ -149,18 +149,33 @@ void handleAssetSelection(AssetList assetList, Asset **selectedAsset) {
 }
 
 void handleSingleExrateSearch(AssetList assetList, Asset *selectedAsset) {
+    Datetime date;
+    Exrate dailyexrate;
+
     if (selectedAsset == NULL)
         printf("No asset selected, please select one\n");
     else {
-
+        date = Datetime_read();
+        dailyexrate = ExrateBST_search(Asset_getExrates(*selectedAsset), date);
+        Exrate_display(stdout, dailyexrate);
     }
 }
 
 void handleMultiExrateSearch(AssetList assetList, Asset *selectedAsset, int withInterval) {
+    Datetime date1, date2;
+    date1 = date2 = Datetime_null();
+
     if (selectedAsset == NULL)
         printf("No asset selected, please select one\n");
     else {
-        
+        if (withInterval) {
+            printf("Reading date1...\n");
+            date1 = Datetime_read();
+            printf("Reading date2...\n");
+            date2 = Datetime_read();
+        }
+
+        ExrateBST_showAllInInterval(Asset_getExrates(*selectedAsset), date1, date2, withInterval);
     }
 
 }
