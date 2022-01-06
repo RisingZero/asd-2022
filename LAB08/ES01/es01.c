@@ -175,7 +175,7 @@ void handleMultiExrateSearch(AssetList assetList, Asset *selectedAsset, int with
             date2 = Datetime_read();
         }
 
-        ExrateBST_showAllInInterval(Asset_getExrates(*selectedAsset), date1, date2, withInterval);
+        ExrateBST_minMaxInInterval(Asset_getExrates(*selectedAsset), date1, date2, withInterval);
     }
 
 }

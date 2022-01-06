@@ -103,7 +103,7 @@ void ExrateBST_merge(ExrateBST dest, ExrateBST src) {
 }
 
 void ExrateBST_balance(ExrateBST bst) {
-    
+    //TODO: implement
 }
 
 Exrate ExrateBST_search(ExrateBST bst, Datetime date) {
@@ -114,15 +114,25 @@ Exrate ExrateBST_search(ExrateBST bst, Datetime date) {
         return Exrate_null();
 }
 
-static link visitInOrderCheckInterval(link h, Datetime date1, Datetime date2, int withInterval, link z) {
+static link visitInOrderCheckInterval(link h, Datetime date1, Datetime date2, int withInterval, link z, Exrate *min, Exrate *max) {
     if (h == z) return;
 
-    visitInOrderCheckInterval(h->left, date1, date2, withInterval, z);
-    if ((withInterval && compareDate(h->exrate.date, date1) >= 0 && compareDate(h->exrate.date, date2) <= 0) || !withInterval)
-        Exrate_display(stdout, h->exrate);
-    visitInOrderCheckInterval(h->right, date1, date2, withInterval, z);
+    visitInOrderCheckInterval(h->left, date1, date2, withInterval, z, min, max);
+    if ((withInterval && compareDate(h->exrate.date, date1) >= 0 && compareDate(h->exrate.date, date2) <= 0) || !withInterval) {
+        if (h->exrate.q > max->q)
+            *max = h->exrate;
+        if (h->exrate.q < min->q)
+            *min = h->exrate;
+    }
+    visitInOrderCheckInterval(h->right, date1, date2, withInterval, z, min, max);
 }
 
-void ExrateBST_showAllInInterval(ExrateBST bst, Datetime date1, Datetime date2, int withInterval) {
-    visitInOrderCheckInterval(bst->root, date1, date2, withInterval, bst->z);
+void ExrateBST_minMaxInInterval(ExrateBST bst, Datetime date1, Datetime date2, int withInterval) {
+    Exrate min, max;
+    min = max = bst->root->exrate;
+    visitInOrderCheckInterval(bst->root, date1, date2, withInterval, bst->z, &min, &max);
+    printf("Min quotation: ");
+    Exrate_display(stdout, min); 
+    printf("Max quotation: ");
+    Exrate_display(stdout, max);
 }
