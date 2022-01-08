@@ -1,5 +1,7 @@
 #include "ExrateBST.h"
 
+#define S 3
+
 typedef struct node_ *link;
 struct node_ {
     Exrate exrate;
@@ -9,6 +11,7 @@ struct node_ {
 struct exrate_bst_ {
     link root;
     link z;
+    int N;
 };
 
 static link NEW(Exrate data, link l, link r) {
@@ -17,9 +20,24 @@ static link NEW(Exrate data, link l, link r) {
     return x;
 }
 
+static link rotR(link h) {
+    link t = h->left;
+    h->left = t->right;
+    t->right = h;
+    return t;
+}
+
+static link rotL(link h) {
+    link t = h->right;
+    h->right = t->left;
+    t->left = h;
+    return t;
+}
+
 ExrateBST ExrateBST_init() {
     ExrateBST bst = (ExrateBST) malloc(sizeof(*bst));
     bst->root = bst->z = NEW(Exrate_null(), NULL, NULL);
+    bst->N = 0;
     return bst;
 }
 
@@ -64,6 +82,7 @@ static void ExrateBST_insertLeaf(ExrateBST bst, Exrate exrate) {
 
     if (bst->root == bst->z) {
         bst->root = NEW(exrate, bst->z, bst->z);
+        bst->N++;
         return;
     }
 
@@ -74,6 +93,7 @@ static void ExrateBST_insertLeaf(ExrateBST bst, Exrate exrate) {
             tp = &((*tp)->right);
     }
     *tp = NEW(exrate, bst->z, bst->z);
+    bst->N++;
 }
 
 void ExrateBST_insert(ExrateBST bst, Exrate exrate) {
@@ -102,8 +122,80 @@ void ExrateBST_merge(ExrateBST dest, ExrateBST src) {
     mergeR(dest, src->root, src->z);
 }
 
+static void recursiveLength(link t, link z, int *min, int *max, int *count) {
+    if (t == z) {
+        if (*count < *min) *min = *count;
+        if (*count > *max) *max = *count;
+        return;
+    }
+
+    (*count)++;
+    recursiveLength(t->left, z, min, max, count);
+    recursiveLength(t->right, z, min, max, count);
+    (*count)--;
+    return;
+}
+
+static int ExrateBST_calculateMinMaxLengthDiff(ExrateBST bst) {
+    int min = bst->N, max = 0;
+    int count = 0;
+
+    recursiveLength(bst->root, bst->z, &min, &max, &count);
+    return max-min;
+}
+
+static int visitInOrderWithIdx(link t, int index, int *count, link z, link *node) {
+    if (t->left != z)
+        visitInOrderWithIdx(t->left, index, count, z, node);
+    if (*count == index) {
+        *node = t;
+    }
+    (*count)++;
+    if (t->right != z)
+        visitInOrderWithIdx(t->right, index, count, z, node);
+}
+
+static link ExrateBST_findMedianNode(ExrateBST bst, int index) {
+    link t = bst->root, z = bst->z, node;
+    int count = 0;
+
+    visitInOrderWithIdx(t, index, &count, z, &node);
+
+    return node;
+}
+
+static link partR(link t, link ref) {
+    if (compareDate(t->exrate.date, ref->exrate.date) > 0) {
+        t->left = partR(t->left, ref);
+        t = rotR(t);
+    } else if (compareDate(t->exrate.date, ref->exrate.date) < 0) {
+        t->right = partR(t->right, ref);
+        t = rotL(t);
+    }
+    return t;
+}
+
 void ExrateBST_balance(ExrateBST bst) {
-    //TODO: implement
+    int diff, idx;
+    link medianNode;
+
+    // calculate the difference between the max and the min root-leaf distances
+    diff = ExrateBST_calculateMinMaxLengthDiff(bst);
+
+    if (diff >= S) {
+        printf("Found unbalance of %d, rebalancing...\n", diff);
+        // find median value
+        idx = (bst->N + 1)/2;
+        medianNode = ExrateBST_findMedianNode(bst, idx);
+        printf("median: %d\n", idx);
+        // partition on median value
+        bst->root = partR(bst->root, medianNode);
+
+        diff = ExrateBST_calculateMinMaxLengthDiff(bst);
+        printf("Rebalanced! New length difference: %d\n", diff);
+    } else {
+        printf("No significative unbalance found\n");
+    }
 }
 
 Exrate ExrateBST_search(ExrateBST bst, Datetime date) {
@@ -114,7 +206,7 @@ Exrate ExrateBST_search(ExrateBST bst, Datetime date) {
         return Exrate_null();
 }
 
-static link visitInOrderCheckInterval(link h, Datetime date1, Datetime date2, int withInterval, link z, Exrate *min, Exrate *max) {
+static void visitInOrderCheckInterval(link h, Datetime date1, Datetime date2, int withInterval, link z, Exrate *min, Exrate *max) {
     if (h == z) return;
 
     visitInOrderCheckInterval(h->left, date1, date2, withInterval, z, min, max);
