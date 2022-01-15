@@ -30,4 +30,6 @@ void GRAPHfindESubsetToDAG(Graph G, Edge *bestEdgeSet, int *bestSetCardinality);
 
 Graph GRAPHcreateFromGraphEdgeSubtraction(Graph G, Edge *toBeRemoved);
 
+void GRAPHfindMaxPathsFromSources(Graph G);
+
 #endif

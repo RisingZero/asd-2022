@@ -1,6 +1,7 @@
 #include "GRAPH.h"
 
 #define MAXC 31
+#define MINWT -32768
 
 typedef struct node *link;
 struct node { int v; int wt; link next; };
@@ -310,4 +311,68 @@ Graph GRAPHcreateFromGraphEdgeSubtraction(Graph G, Edge *toBeRemoved) {
     }
 
     return G2;
+}
+
+static int GRAPHcheckSource(Graph G, int id) {
+    Edge *a;
+    int i;
+
+    a = (Edge *) malloc(G->E * sizeof(Edge));
+    GRAPHedges(G, a);
+
+    for (i = 0; i < G->E; i++) {
+        if (a[i].w == id) {
+            return 0;
+        }
+    }
+
+    return 1;
+}
+
+void GRAPHfindMaxPathsFromSources(Graph G) {
+    int *d, *st, i, j, k;
+    link t;
+    
+    d = (int *) malloc(G->V * sizeof(int));
+    st = (int *) malloc(G->V * sizeof(int));
+
+    for (i = 0; i < G->V; i++) {
+        if (GRAPHcheckSource(G, i)) {
+
+            for (j = 0; j< G->V; j++) {
+                d[j] = MINWT;
+                st[j] = -1;
+            }
+            d[i] = 0; st[i] = i;
+
+            for (j = 0; j < G->V-1; j++) {
+                for (k = 0; k < G->V; k++) {
+                    for (t = G->ladj[k]; t != G->z; t = t->next) {
+                        if (d[t->v] < d[k] + t->wt) {
+                            st[t->v] = k;
+                            d[t->v] = d[k] + t->wt;
+                        }
+                    }
+                    
+                }
+            }
+
+            // Show max path from source i
+            for (j = 0; j < G->V; j++) {
+                k = j;
+                if (j != i) {
+                    printf("Max path from source %s to %s:\n", STsearchByIndex(G->tab, i), STsearchByIndex(G->tab, j));
+                    printf("%s", STsearchByIndex(G->tab, k));
+                    while (k != i) {
+                        printf(" <- %s", STsearchByIndex(G->tab, st[k]));
+                        k = st[k];
+                    }
+                    printf("\nTotal weight: %d\n", d[j]);
+                }
+            }
+        }
+    }
+
+    free(d);
+    free(st);
 }

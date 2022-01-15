@@ -14,7 +14,7 @@ int main(int argc, char const *argv[])
     Edge *bestEdgesSet;
     int bestCardinality, i;
 
-    if ((fp = fopen("grafo2.txt", "r")) == NULL) {
+    if ((fp = fopen("grafo4.txt", "r")) == NULL) {
         printf("Error opening file");
         exit(1);
     }
@@ -26,8 +26,9 @@ int main(int argc, char const *argv[])
     GRAPHfindESubsetToDAG(G, bestEdgesSet, &bestCardinality);
 
     dag = GRAPHcreateFromGraphEdgeSubtraction(G, bestEdgesSet);
-
     GRAPHstore(dag, stdout);
+
+    GRAPHfindMaxPathsFromSources(dag);
 
     GRAPHfree(G);
     GRAPHfree(dag);
