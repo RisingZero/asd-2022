@@ -84,7 +84,6 @@ int readElements(char *filename, Elemento **el) {
     fclose(fp);
 
     return N;
-
 }
 
 Boolean checkValidProgramma(Programma *progr, Elemento *elementi, int N) {
