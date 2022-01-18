@@ -44,11 +44,12 @@ int compareFunc(void *_context, const void *a, const void *b);
 void stampaSoluzione(Elemento *sol, int N, int *kp);
 
 int main(int argc, char const *argv[]) {
-    int N, DD = 12, DP = 30;
+    int N, DD = 10, DP = 20;
     Elemento *elementi;
 
     N = readElements("elementi.txt", &elementi);
 
+    // SOLUZIONE GREEDY - RAGGIUNGE SOLUZIONI QUASI OTTIME MA SEMPRE ACCETTABILI PER TUTTI I TEST CASE FORNITI
     printf("--- Test Case #1 ---\n");
     printf("DD = %d DP = %d\n", DD, DP);
     findBestProgrammaGreedy(elementi, N, DD, DP);
@@ -88,10 +89,11 @@ int readElements(char *filename, Elemento **el) {
 
 void findBestProgrammaGreedy(Elemento *elementi, int N, int DD, int DP) {
     int *kp, diffDiags[MAX_DIAG] = {0};
-    int i, pos, posInDiag, currKp, diffTot, numAcc, minAv = DD, minInd = DD;
+    int i, tmp, pos, posInDiag, currKp, diffTot, numAcc, minAv = DD, minInd = DD;
     Elemento *accettabili, *sol;
-    ObjFuncParams params;
+    ObjFuncParams params[MAX_DIAG];
     Boolean found;
+    Boolean hasFinale[MAX_DIAG];
 
     for (i = 0; i < N; i++) {
         if (elementi[i].diff < minAv && elementi[i].tipo == ACROB_AVANTI)
@@ -99,121 +101,127 @@ void findBestProgrammaGreedy(Elemento *elementi, int N, int DD, int DP) {
         if (elementi[i].diff < minInd && elementi[i].tipo == ACROB_INDIETRO)
             minInd = elementi[i].diff;
     }
+    for (i = 0; i < MAX_DIAG; i++) {
+        hasFinale[i] = false;
+        params[i].needAcrobInSeq = params[i].acrobInSeq = false;
+        params[i].needAcrobAv = params[i].needAcrobInd = params[i].needAcrobInDiag = true;
+    }
     kp = (int *) malloc(MAX_DIAG * MAX_ELEM * sizeof(int));
     for (i = 0; i < MAX_DIAG * MAX_ELEM; i++)
         kp[i] = -1;
     sol = (Elemento *) malloc(MAX_DIAG * MAX_ELEM * sizeof(Elemento));
     accettabili = (Elemento *) malloc(N * sizeof(Elemento));
-    params.needAcrobInSeq = params.acrobInSeq = false;
-    params.needAcrobAv = params.needAcrobInd = params.needAcrobInDiag = true;
 
-    diffTot = 0; posInDiag = 0; currKp = 0;
-    for (pos = 0; pos < MAX_DIAG * MAX_ELEM; ) {
-        currKp = pos / MAX_ELEM;
-        numAcc = getAccettabili(accettabili, elementi, N, DD, DP, sol, pos, posInDiag, currKp, diffDiags, diffTot, params);
-        if (numAcc > 0) {
-            // Ordinamento descrescente delle scelte possibili
-            sortAccettabili(accettabili, numAcc, sol, pos, currKp, &params);
-
-            if (params.needAcrobAv != params.needAcrobInd) {
-                found = false;
-                if (params.needAcrobAv) {
-                    for (i = 0; i < numAcc && !found; i++) {
-                        if (accettabili[i].tipo == ACROB_AVANTI) {
-                            found = true;
-                            // Effettuo scelta localmente ottima
-                            sol[pos] = accettabili[0];
-                            kp[pos] = currKp;
-                        }     
-                    }
-                    
-                    if (!found) {
+    diffTot = 0;
+    for (posInDiag = 0; posInDiag < MAX_ELEM; posInDiag++) {
+        for (currKp = 0; currKp < MAX_DIAG; currKp++) {
+            pos = posInDiag + currKp * 5;
+            if (!hasFinale[currKp]) {
+                numAcc = getAccettabili(accettabili, elementi, N, DD, DP, sol, pos, posInDiag, currKp, diffDiags, diffTot, params[currKp]);
+                if (numAcc > 0) {
+                    // Ordinamento descrescente delle scelte possibili
+                    sortAccettabili(accettabili, numAcc, sol, pos, currKp, &params);
+                    if (params[currKp].needAcrobAv != params[currKp].needAcrobInd) {
                         found = false;
-                        for (i = 0; i < numAcc && !found; i++) {
-                            if (accettabili[i].dirIngresso != accettabili[i].dirUscita && diffDiags[currKp] + accettabili[i].diff + minAv <= DD && !accettabili[i].finale) {
-                                sol[pos] = accettabili[i];
-                                kp[pos] = currKp;
-                                found = true;
+                        if (params[currKp].needAcrobAv) {
+                            for (i = 0; i < numAcc && !found; i++) {
+                                if (accettabili[i].tipo == ACROB_AVANTI) {
+                                    found = true;
+                                    // Effettuo scelta localmente ottima
+                                    sol[pos] = accettabili[0];
+                                    kp[pos] = currKp;
+                                }     
+                            }
+                            
+                            if (!found) {
+                                found = false;
+                                for (i = 0; i < numAcc && !found; i++) {
+                                    if (accettabili[i].dirIngresso != accettabili[i].dirUscita && diffDiags[currKp] + accettabili[i].diff + minAv <= DD && !accettabili[i].finale) {
+                                        sol[pos] = accettabili[i];
+                                        kp[pos] = currKp;
+                                        found = true;
+                                        for (tmp = 0; tmp < MAX_DIAG; tmp++)
+                                            params[tmp].needAcrobAv = false;
+                                        params[currKp].needAcrobAv = true;
+
+                                    }
+                                }
+                                if (!found) {
+                                    // Effettuo scelta localmente ottima
+                                    sol[pos] = accettabili[0];
+                                    kp[pos] = currKp;
+                                }
                             }
                         }
-                        if (!found) {
-                            // Effettuo scelta localmente ottima
-                            sol[pos] = accettabili[0];
-                            kp[pos] = currKp;
-                        }
-                    }
-                }
 
-                if (params.needAcrobInd) {
-                    for (i = 0; i < numAcc && !found; i++) {
-                        if (accettabili[i].tipo == ACROB_INDIETRO) {
-                            found = true;
-                            // Effettuo scelta localmente ottima
-                            sol[pos] = accettabili[0];
-                            kp[pos] = currKp;
-                        }     
-                    }
-                    
-                    if (!found) {
-                        found = false;
-                        for (i = 0; i < numAcc && !found; i++) {
-                            if (accettabili[i].dirIngresso != accettabili[i].dirUscita && diffDiags[currKp] + accettabili[i].diff + minInd <= DD && !accettabili[i].finale) {
-                                sol[pos] = accettabili[i];
-                                kp[pos] = currKp;
-                                found = true;
+                        if (params[currKp].needAcrobInd) {
+                            for (i = 0; i < numAcc && !found; i++) {
+                                if (accettabili[i].tipo == ACROB_INDIETRO) {
+                                    found = true;
+                                    // Effettuo scelta localmente ottima
+                                    sol[pos] = accettabili[0];
+                                    kp[pos] = currKp;
+                                }     
+                            }
+                            
+                            if (!found) {
+                                found = false;
+                                for (i = 0; i < numAcc && !found; i++) {
+                                    if (accettabili[i].dirIngresso != accettabili[i].dirUscita && diffDiags[currKp] + accettabili[i].diff + minInd <= DD && !accettabili[i].finale) {
+                                        sol[pos] = accettabili[i];
+                                        kp[pos] = currKp;
+                                        for (tmp = 0; tmp < MAX_DIAG; tmp++)
+                                            params[tmp].needAcrobInd = false;
+                                        params[currKp].needAcrobInd = true;
+                                        found = true;
+                                    }
+                                }
+                                if (!found) {
+                                    // Effettuo scelta localmente ottima
+                                    sol[pos] = accettabili[0];
+                                    kp[pos] = currKp;
+                                }
                             }
                         }
-                        if (!found) {
-                            // Effettuo scelta localmente ottima
-                            sol[pos] = accettabili[0];
-                            kp[pos] = currKp;
-                        }
+                    } else {
+                        // Effettuo scelta localmente ottima
+                        sol[pos] = accettabili[0];
+                        kp[pos] = currKp;
                     }
-                }
-            } else {
-                // Effettuo scelta localmente ottima
-                sol[pos] = accettabili[0];
-                kp[pos] = currKp;
-            }
 
-            // Aggiornamento difficoltà
-            diffDiags[currKp] += sol[pos].diff;
-            diffTot += sol[pos].diff;
+                    // Aggiornamento difficoltà
+                    diffDiags[currKp] += sol[pos].diff;
+                    diffTot += sol[pos].diff;
 
-            // Aggiornamento parametri funzione obiettivo
-            if (sol[pos].tipo == ACROB_AVANTI) {
-                params.needAcrobAv = false;
-                params.needAcrobInDiag = false;
-            }
-            if (sol[pos].tipo == ACROB_INDIETRO) {
-                params.needAcrobInd = false;
-                params.needAcrobInDiag = false;
-            }
+                    // Aggiornamento parametri funzione obiettivo
+                    if (sol[pos].tipo == ACROB_AVANTI) {
+                        for (i = 0; i < MAX_DIAG; i++)
+                            params[i].needAcrobAv = false;
+                        params[currKp].needAcrobInDiag = false;
+                    }
+                    if (sol[pos].tipo == ACROB_INDIETRO) {
+                        for (i = 0; i < MAX_DIAG; i++)
+                            params[i].needAcrobInd = false;
+                        params[currKp].needAcrobInDiag = false;
+                    }
 
-            if (posInDiag > 0 && sol[pos].tipo > 0 && sol[pos-1].tipo > 0) {
-                params.acrobInSeq = true;
-            }
+                    if (posInDiag > 0 && sol[pos].tipo > 0 && sol[pos-1].tipo > 0) {
+                        for (i = 0; i < MAX_DIAG; i++)
+                            params[i].acrobInSeq = true;
+                    }
 
-            if (posInDiag > 0 && sol[pos-1].tipo > 0 && !params.acrobInSeq) {
-                params.needAcrobInSeq = true;
-            } else
-                params.needAcrobInSeq = false;
+                    if (posInDiag > 0 && sol[pos-1].tipo > 0 && !params[currKp].acrobInSeq) {
+                        params[currKp].needAcrobInSeq = true;
+                    } else
+                        params[currKp].needAcrobInSeq = false;
 
-            if (sol[pos].finale) {
-                // Skip a prossima diagonale se è stato inserito un elemento finale 
-                pos = (currKp + 1) * MAX_ELEM;
-                params.needAcrobInDiag = true;
-                posInDiag = 0;
-            } else {
-                pos++;
-                posInDiag++;
-            }
-        } else {
-            // Skip a prossima diagonale in caso di impossibilità di scelta
-            pos = (currKp + 1) * MAX_ELEM;
-            params.needAcrobInDiag = true;
-            posInDiag = 0;
-        }
+                    if (sol[pos].finale) {
+                        // Skip a prossima diagonale se è stato inserito un elemento finale 
+                        hasFinale[currKp] = true;
+                    }
+                }  
+            }  
+        }            
     }
 
     stampaSoluzione(sol, MAX_DIAG * MAX_ELEM, kp);
@@ -316,5 +324,5 @@ void stampaSoluzione(Elemento *sol, int N, int *kp) {
         }
         printf("\n");
     }
-    printf("TOT = %.3f DiffTot: %d", tot, diffTot);
+    printf("TOT = %.3f DiffTot: %d\n\n", tot, diffTot);
 }
