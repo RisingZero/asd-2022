@@ -37,15 +37,17 @@
             ADT (tipo di dato astratto) necessario a memorizzare il grafo letto da file e il grafo aciclico (DAG) successivamente ricavato.
             Rispettando i requisiti di ADT l'implementazione interna del tipo grafo è nascosta al client.
             L'implementazione interna è stata effettuata tramite lista delle adiacenze e le corrispondenze indice-vertice sono contenute in tabella di simboli (tipo ST).
-            Questa implementazione prevede l'utilizzo di grafi orientati pesati ma nessuna conoscenza particolare riguardo la ciclicità del grafo, lasciata in responsabilità al client. Non
-            si è quindi scelto di implementare una ADT adhoc per il DAG.
+            L'ADT implementato è predisposto per la rappresentazione di grafi orientati pesati, senza nessuna conoscenza particolare riguardo la ciclicità del grafo, di cui rimane responsabile il client. Non
+            si è quindi scelto di implementare un ADT adhoc per un DAG.
+
+            \includegraphics[width=15cm]{graph.jpg}
             
             Alle funzioni di libreria di base sono state aggiunte le seguenti funzioni: 
 
             \begin{itemize}
                 \item \textbf{void ECdfsR()} 
                 
-                Tramite una visità in profondità classifica gli archi del grafo
+                Tramite una visita in profondità classifica gli archi del grafo
 
                 \item \textbf{void GRAPHfindESubsetToDAG()}
                 
@@ -74,7 +76,12 @@
                 Dato un grafo orientato, era richiesto identificare i sottoinsiemi di archi a cardinalità minima che rendessero il grafo un DAG se rimossi.
                 Un approccio base al calcolo della soluzione sarebbe l'applicazione dei modelli di calcolo combinatorio per effettuare una esplorazione esaustiva dello
                 spazio delle soluzioni con conseguente verifica di aciclicità e minima cardinalità delle soluzioni trovate. Una soluzione di questo tipo, per quanto efficace,
-                è molto costosa da un punto di vista computazionale. Si è quindi cercata una soluzione alternativa.
+                è molto costosa da un punto di vista computazionale (costo esponenziale nel numero di archi
+                \begin{math}
+                    O(2^{|E|})
+                \end{math}
+                ).
+                Si è quindi cercata una soluzione alternativa.
                 L'algoritmo implementato si basa sull'idea che dato un grafo orientato, a seguito di una classificazione degli archi del grafo, la rimozione di tutti gli archi di
                 tipo backward sia necessaria e sufficiente per soddisfare la richiesta di aciclicità. Il problema quindi si riduce alla ricerca dell'insieme di archi backward a minima cardinalità,
                 effettuata tramite ripetute visite in profondità, una a partire da ogni vertice del grafo. Identificati quindi gli insiemi di archi backward a minima cardinalità, si procede alla
