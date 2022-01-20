@@ -44,7 +44,7 @@ int compareFunc(void *_context, const void *a, const void *b);
 void stampaSoluzione(Elemento *sol, int N, int *kp);
 
 int main(int argc, char const *argv[]) {
-    int N, DD = 10, DP = 20;
+    int N, DD = 11, DP = 33;
     Elemento *elementi;
 
     N = readElements("elementi.txt", &elementi);
@@ -302,21 +302,45 @@ int compareFunc(void *_context, const void *a, const void *b) {
 }
 
 void stampaSoluzione(Elemento *sol, int N, int *kp) {
-    int i, j;
-    int diffParz, diffTot = 0;
+    int i, j, bonusKp = -1;
     float tot = 0, parz;
 
+    // Ricerca possibile diagonale con elemento bonus
+    for (i = 0; i < MAX_DIAG && bonusKp == -1; i++) {
+        for (j = 0; j < MAX_ELEM && bonusKp == -1; j++) {
+            if ((kp[j + MAX_ELEM * i] == -1 || j == MAX_ELEM - 1) && sol[j + MAX_ELEM * i - 1].diff >= 8) {
+                bonusKp = i;
+            }
+        }
+    }
+
+    // Scambio diagonale bonus, se trovata, con l'ultima diagonale
+    if (bonusKp != -1 && bonusKp != MAX_DIAG - 1) {
+        for (i = 0; i < N; i++) {
+            if (kp[i] == bonusKp) kp[i] = MAX_DIAG;
+            if (kp[i] == MAX_DIAG - 1) kp[i] = bonusKp;
+        }
+        for (i = 0; i < N; i++) {
+            if (kp[i] == MAX_DIAG) kp[i] = MAX_DIAG - 1;
+        }
+        bonusKp = MAX_DIAG - 1;
+    }
+
     for (j = 0; j < MAX_DIAG; j++) {
-        parz = 0; diffParz = 0;
+        parz = 0;
         for (i = 0; i < N; i++) {
             if (kp[i] == j) {
-                diffParz += sol[i].diff;
                 parz += sol[i].valore;
             }
         }
+        printf("DIAG #%d > %.3f", j+1, parz);
+        if (j == bonusKp)
+            printf(" * 1.5 (BONUS)");
+        printf("\n");
+        if (j == bonusKp) {
+            parz = parz * 1.5;
+        }
         tot += parz;
-        diffTot += diffParz;
-        printf("DIAG #%d > %.3f diff: %d\n", j+1, parz, diffParz);
         for (i = 0; i < N; i++) {
             if (kp[i] == j) {
                 printf("%s ", sol[i].nome);
@@ -324,5 +348,5 @@ void stampaSoluzione(Elemento *sol, int N, int *kp) {
         }
         printf("\n");
     }
-    printf("TOT = %.3f DiffTot: %d\n\n", tot, diffTot);
+    printf("TOT = %.3f\n", tot);
 }
