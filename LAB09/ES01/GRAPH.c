@@ -99,7 +99,7 @@ void GRAPHstore(Graph G, FILE *fout) {
     int i;
     Edge *a;
 
-    a = malloc(G->E * sizeof(Edge));
+    a = (Edge *) malloc(G->E * sizeof(Edge));
     GRAPHedges(G, a);
 
     fprintf(fout, "%d\n", G->V);
