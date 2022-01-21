@@ -85,8 +85,7 @@
                 L'algoritmo implementato si basa sull'idea che dato un grafo orientato, a seguito di una classificazione degli archi del grafo, la rimozione di tutti gli archi di
                 tipo backward sia necessaria e sufficiente per soddisfare la richiesta di aciclicità. Il problema quindi si riduce alla ricerca dell'insieme di archi backward a minima cardinalità,
                 effettuata tramite ripetute visite in profondità, una a partire da ogni vertice del grafo. Identificati quindi gli insiemi di archi backward a minima cardinalità, si procede alla
-                ricerca dell'insieme a massimo peso e alla creazione di un nuovo grafo privato di questo insieme di archi.
-
+                ricerca dell'insieme a massimo peso e alla creazione di un nuovo grafo privato di questo insieme di archi.\\
                 La stima di complessità dell'algoritmo implementato è 
                 \begin{math}
                     O(|V| |E| + |V|+|E|) = O(|V| |E|)
@@ -98,11 +97,11 @@
                 L'algoritmo implementato per risolvere il problema si ispira all'algoritmo di Bellman-Ford per la ricerca dei cammini minimi su grafo a partire da una sorgente, con due variazioni
                 che lo adattano al nostro caso: 
                 
-                1) il passo di "relaxation" applicato sugli archi cerca di massimizzare il peso del cammino
-                
-                2) Prevedendo l'algoritmo di Bellman-Ford la ricerca dei cammini a partire da una sola sorgente, si effettua un ciclo sui vertici del grafo e si effettua la ricerca dei cammini se questi sono nodi sorgente
-
-                La stime di complessità dell'algoritmo così implementato è dunque 
+                \begin{enumerate}
+                    \item il passo di "relaxation" applicato sugli archi cerca di massimizzare il peso del cammino
+                    \item prevedendo l'algoritmo di Bellman-Ford la ricerca dei cammini a partire da una sola sorgente, si effettua un ciclo sui vertici del grafo e si effettua la ricerca dei cammini se questi sono nodi sorgente
+                \end{enumerate}
+                La stima di complessità dell'algoritmo così implementato è dunque 
                 \begin{math}
                     O(|V|^2 |E|)
                 \end{math}
