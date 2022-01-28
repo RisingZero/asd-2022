@@ -5,7 +5,7 @@ void readFile(FILE *fin, int ***griglia, int *R, int *C);
 void verificaProposta(FILE *fin, int **griglia, int R, int C);
 void resetGriglia(int **griglia, int R, int C);
 int check(int **griglia, int R, int C);
-void free2d(int ***mat, int R, int C);
+void free2d(int ***griglia, int R, int C);
 void findBestCopertura(int **griglia, int R, int C);
 int findCopertura(int pos, int *sol, int *dx, int **griglia, int R, int C, int n);
 
@@ -99,12 +99,12 @@ int check(int **griglia, int R, int C) {
     return 1;
 }
 
-void free2d(int ***mat, int R, int C) {
+void free2d(int ***griglia, int R, int C) {
     int i;
     for (i = 0; i < R; i++) {
-        free((*mat)[i]);
+        free((*griglia)[i]);
     }
-    free(*mat);
+    free(*griglia);
 }
 
 void findBestCopertura(int **griglia, int R, int C) {

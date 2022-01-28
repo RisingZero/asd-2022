@@ -18,6 +18,26 @@
 \definecolor{backcolour}{rgb}{0.95,0.95,0.92}
 \newcommand{\code}[1]{\colorbox{light-gray}{\texttt{#1}}}
 
+\lstset{frame=n,
+  language=C,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\footnotesize\ttfamily},
+  numbers=left,
+  numberstyle=\tiny\ttfamily\color{codegray},
+  commentstyle=\color{codepurple},
+  stringstyle=\color{codegreen},
+  breaklines=true,
+  breakatwhitespace=true,
+  escapeinside={@}{@},
+  showspaces=false,
+  showtabs=false,
+  tabsize=2,
+  gobble=8
+}
+
 \begin{document}
 
     \title{
@@ -31,8 +51,88 @@
     \date{27/1/22}
     \maketitle
 
+    \section{Modifiche apportate alla versione originale}
+        \begin{itemize}
+            \item Aggiunti prototipi di funzione in testa al file, prima della funzione main()
+            \item \textbf{riga 102}: corretto nome variabile utilizzato all'interno della funzione nei parametri
+            
+                \code{void free2d(int ***mat, int R, int C)}
+
+                in
+
+                \code{void free2d(int ***griglia, int R, int C)}
+
+            \item \textbf{riga 149 e 153}: aggiunto controllo mancante per verifica validità dimensione regione quadrata (la dimensione deve rispettare i limiti della matrice stessa)
+            
+            \begin{lstlisting}[firstnumber=149]
+            for (d = 1; d <= R @\textcolor{red}{\&\& d <= C}@; d++) {
+            validDim = 1;
+            for (i = 0; i < d && validDim; i++) {
+                for (j = 0; j < d && validDim; j++) {
+                    if (@\textcolor{red}{(pos/C + i) >= R || (pos\%C + j) >= C ||}@ griglia[pos/C + i][pos%C + j] > 0)
+                        validDim = 0;
+                }
+            }
+            \end{lstlisting}
+        \end{itemize}
+
     \section{Strutture dati utilizzate}
+        E' stata utilizzata principalmente un unica struttura dati al fine di memorizzare la struttura della griglia e al fine di
+        mantenere traccia della copertura in fase di costruzione di una soluzione ottima. Si è scelto di utilizzare una \textbf{matrice di interi}
+        di NR righe ed NC colonne (ricevuti come parametri durante la lettura del file \texttt{griglia.txt} in cui ogni cella assume valore:
+        \begin{itemize}
+            \item \textbf{0} se libera
+            \item \textbf{1} se occupata da un ostacolo
+            \item \textbf{2} se occupata da una regione\\
+        \end{itemize}
 
+        L'algoritmo per il calcolo di una copertura ottima fa uso della matrice per tenere traccia dell'area già coperta da regioni
+        e salva le regioni che vengono inserite in due \textbf{vettori} che tengono traccia della posizione dell'angolo in alto a sinistra di una regione
+        all'interno della matrice e della dimensione della regione. Il file \texttt{proposta.txt} si è supposto avente un formato simile, con l'eventuale
+        possibilità che una regione avesse differenti dimensioni di altezza e larghezza.\\
 
+        La "posizione" di una regione, sia all'interno del file \texttt{proposta.txt} che durante la costruzione della soluzione ottima si intende come distanza
+        dalla posizione in alto a sinistra della matrice in strategia row-major. Viene dunque convertita in indici specifici riga e colonna quando necessario.
     \section{Strategie algoritmiche}
+        \begin{enumerate}
+            \item \textbf{Verifica validità copertura ricevuta da file}
+            
+            Per ogni regione, indicata nel file di input da posizione, larghezza e altezza, si verifica che le due dimensioni corrispondano (verifica di regione quadrata)
+            e si salva all'interno della griglia la regione salvando il valore 2 in ogni cella coperta dalla regione. 
+            Dopo aver memorizzato tutte le regioni della proposta di copertura si verifica che tutte le celle della griglia abbiano valore non nullo. 
+            Il costo di complessità della verifica di completa copertura delle regioni bianche è
+            \begin{math}
+                O(NR*NC)
+            \end{math}
+            nel caso di copertura non valida,
+            \begin{math}
+                \Theta(NR*NC)
+            \end{math}
+            nel caso di copertura valida.
+            \item \textbf{Ricerca copertura ottima}
+            
+            L'algoritmo utilizzato per la ricerca di una copertura ottima sfrutta un approccio divide et impera.
+            L'obiettivo di ogni chiamata alla funzione \texttt{findCopertura(pos, n)} è quella di inserire a partire dalla posizione \emph{pos} un numero \emph{n} di regioni.
+            
+            Ad ogni passo ricorsivo:
+                \begin{itemize}
+                    \item se la cella è già occupata (valore 1 o 2) allora non si effettua nessuna operazione e si ricorre direttamente alla posizione successiva
+                    \item se la cella ha valore 0 (cella bianca non coperta) si prova ad inserire una regione di una certa dimensione, si salva la modifica sulla griglia ponendo valore 2 nelle celle interessate
+                    e si ricorre alla posizione successiva con un numero \emph{n-1} di regioni ancora da inserire
+                \end{itemize}
+
+            La ricorsione termina quando \emph{pos} raggiunge l'ultima posizione sulla griglia o quando sono state inserite tutte le regioni. A questo punto si sfrutta la stessa funzione
+            di verifica implementata al punto precedente per verificare la validità della soluzione.\\
+
+            Quando si deve inserire una regione in una posizione la dimensione (inizialmente 1) viene incrementata ogni volta che la discesa ricorsiva non ha portato ad una soluzione accettabile, fino ad una dimensione
+            massima accettabile tale da non portare la regione a fuoriuscire dalla matrice stessa o a coprire delle celle già coperte/occupate.
+
+            La funzione wrapper si occupa dell'incremento della variabile \emph{n}, ovvero del numero di regioni utilizzate per coprire l'area bianca.
+            Partendo da un numero di regioni uguale a 1 si incrementa il valore finché la funzione \texttt{findCopertura(0, n)}
+            non trova una soluzione valida. In questo modo si è certi che la prima soluzione valida identificata è anche quella ottima in termini di regioni utilizzate.
+
+            La presenza di backtrack nella scelta della dimensione di una regione ad ogni passo della ricorsione rende l'algoritmo molto costoso da un punto di vista
+            computazionale. La complessità non è inoltre legata unicamente alle dimensioni della matrice ma dipende pesantemente anche dalla presenza di celle ostacolo
+            e dalla loro disposizione sulla griglia. 
+        \end{enumerate}
 \end{document}
