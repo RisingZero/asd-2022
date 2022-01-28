@@ -77,7 +77,7 @@
         \end{itemize}
 
     \section{Strutture dati utilizzate}
-        E' stata utilizzata principalmente un unica struttura dati al fine di memorizzare la struttura della griglia e al fine di
+        E' stata utilizzata principalmente un'unica struttura dati al fine di memorizzare la struttura della griglia e di
         mantenere traccia della copertura in fase di costruzione di una soluzione ottima. Si è scelto di utilizzare una \textbf{matrice di interi}
         di NR righe ed NC colonne (ricevuti come parametri durante la lettura del file \texttt{griglia.txt} in cui ogni cella assume valore:
         \begin{itemize}
@@ -86,13 +86,13 @@
             \item \textbf{2} se occupata da una regione\\
         \end{itemize}
 
-        L'algoritmo per il calcolo di una copertura ottima fa uso della matrice per tenere traccia dell'area già coperta da regioni
-        e salva le regioni che vengono inserite in due \textbf{vettori} che tengono traccia della posizione dell'angolo in alto a sinistra di una regione
-        all'interno della matrice e della dimensione della regione. Il file \texttt{proposta.txt} si è supposto avente un formato simile, con l'eventuale
+        L'algoritmo per il calcolo di una copertura ottima fa uso della matrice per tenere traccia dell'area già coperta
+        e salva le regioni man mano inserite con due \textbf{vettori} che registrano la posizione dell'angolo in alto a sinistra di una regione
+        all'interno della matrice e la sua dimensione. Il file \texttt{proposta.txt} si è supposto avente un formato simile, con l'eventuale
         possibilità che una regione avesse differenti dimensioni di altezza e larghezza.\\
 
         La "posizione" di una regione, sia all'interno del file \texttt{proposta.txt} che durante la costruzione della soluzione ottima si intende come distanza
-        dalla posizione in alto a sinistra della matrice in strategia row-major. Viene dunque convertita in indici specifici riga e colonna quando necessario.
+        dall'angolo in alto a sinistra della matrice in strategia row-major. Viene dunque convertita in indici specifici riga e colonna quando necessario.
     \section{Strategie algoritmiche}
         \begin{enumerate}
             \item \textbf{Verifica validità copertura ricevuta da file}
